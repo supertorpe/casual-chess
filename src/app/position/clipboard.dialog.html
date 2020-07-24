@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{'position.clipboard.title' | translate}}</ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-grid>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="copyFen()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="clipboard"></ion-icon><ion-label>FEN</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="copyPgn()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="clipboard"></ion-icon><ion-label>PGN</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="copyImg()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="save"></ion-icon><ion-label>IMG</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>

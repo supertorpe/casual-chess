@@ -1,0 +1,93 @@
+{
+    "app": {
+        "menu": "Menú",
+        "home": "Inicio",
+        "preferences": "Configuración",
+        "about": "Acerca de",
+        "exit": "Salir",
+        "back-to-exit": "Pulse 'atrás' de nuevo para salir"
+    },
+    "home": {
+        "title": "Casual Chess",
+        "get-started": "Inicia una partida rápidamente, sin necesidad de registro.",
+        "presentation": "Ajedrez sin reloj",
+        "description": "Ya existen en internet otros sitios fantásticos para jugar al ajedrez, pero también son complejos y recargados de funcionalidades. A veces simplemente quieres jugar una partida con algún conocido sin tener que registrarte en ningún sitio. Casual Chess intenta cubrir ese hueco.",
+        "new-game": "Nueva partida",
+        "finished": "Finalizada",
+        "lost": "Perdida",
+        "won": "Ganada",
+        "your-turn": "Tu turno",
+        "not-your-turn": "Esperando al oponente",
+        "in-progress": "En curso",
+        "link-white-player": "Enlace para jugador de blancas",
+        "link-black-player": "Enlace para jugador de negras",
+        "link-viewer": "Enlace para espectadores",
+        "link-copied": "Enlace copiado al portapapeles",
+        "delete-dialog" : {
+            "title": "¿Está seguro?",
+            "subtitle": "Eliminar partida",
+            "message": "El oponente seguirá teniendo acceso a la partida",
+            "cancel": "Cancelar",
+            "continue": "Continuar"
+        }
+    },
+    "position": {
+        "white": "blancas",
+        "black": "negras",
+        "to": "buscan",
+        "checkmate": "mate",
+        "draw": "tablas",
+        "moves": "movimientos",
+        "your-turn": "Tu turno",
+        "not-your-turn": "Turno del adversario",
+        "white-turn": "Turno de blancas",
+        "black-turn": "Turno de negras",
+        "gameover": "Partida finalizada",
+        "congratulations": "Enhorabuena",
+        "review": "revisar",
+        "fen-clipboard": "FEN copiado al portapapeles",
+        "pgn-clipboard": "PGN copiado al portapapeles",
+        "img-clipboard": "Imagen copiada al portapapeles",
+        "in": "en",
+        "ups": "¡Ohhh!",
+        "ok": "Aceptar",
+        "clipboard": {
+            "title": "¿Qué quieres copiar al portapapeles?"
+        }
+    },
+    "chessboard": {
+        "stalemate": "Ahogado",
+        "insufficent-material": "Material insuficiente",
+        "three-repetition": "Triple repetición",
+        "rule-fifty": "Tablas: regla 50 movimientos",
+        "game-over": "Fin del juego",
+        "mate-in": "Puedes conseguir mate en",
+        "receive-mate-in": "Vas a recibir mate",
+        "unfeasible-mate": "Mate inviable",
+        "white-advantage": "Ventaja blancas",
+        "black-advantage": "Ventaja negras",
+        "promotion": {
+            "title": "Elija la pieza para promocionar"
+        }
+    },
+    "preferences": {
+        "title": "Configuración",
+        "color-theme": "Apariencia",
+        "piece-theme": "Estilo de piezas",
+        "board-theme": "Colores del tablero",
+        "save-changes": "Guardar cambios",
+        "changes-saved": "Cambios guardados",
+        "play-sounds": "Sonido",
+        "highlight-squares": "Iluminar casillas"
+    },
+    "about": {
+        "title": "Acerca de",
+        "description": "Casual Chess es un proyecto open source",
+        "source-code": "Código fuente",
+        "third-party": "Para su desarrollo se ha utilizado el siguiente software y recursos de terceros:",
+        "eco-description": "Base de datos de finales de ajedrez",
+        "chessjs-description": "Librería Javascript para la generación / validación / posicionamiento de movimientos de piezas, y detección de jaque, mate y tablas",
+        "chessboard-description": "Un tablero de ajedrez en Javascript",
+        "multimedia-from": "Iconos y Audio de"
+    }
+}

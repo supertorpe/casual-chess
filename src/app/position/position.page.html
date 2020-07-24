@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title text-center class="padding-0">
+      <span class="responsive-text">{{infotext}}</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="container">
+    <div class="board_wrapper" id="board-wrapper">
+      <chessboard #chessboard 
+        (warn)="onWarn($event)" (playerMoved)="onPlayerMoved()"
+        (gameOver)="onGameOver($event)">
+      </chessboard>
+    </div>
+    <div class="info_wrapper" *ngIf="game">
+      <div class="info">
+        <div class="innerinfo">
+          <div>{{game.pgn}}</div>
+        </div>
+      </div>
+      <div class="action_buttons" *ngIf="game">
+        <ion-grid>
+          <ion-row *ngIf="!game.gameover">
+            <ion-col size="2">
+              <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="sync"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="game.gameover">
+            <ion-col size="2">
+              <ion-button [disabled]="autoplaying || chessboard.isShowingFirstPosition()"
+                (click)="btnShowFirstPositionClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">
+              <ion-button [disabled]="autoplaying || chessboard.isShowingFirstPosition()"
+                (click)="btnShowPreviousPositionClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="play-back-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">
+              <ion-button *ngIf="!autoplaying" [disabled]="chessboard.isShowingLatestPosition()"
+                (click)="btnPlayClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+              </ion-button>
+              <ion-button *ngIf="autoplaying" (click)="btnPauseClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="pause-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">
+              <ion-button [disabled]="autoplaying || chessboard.isShowingLatestPosition()"
+                (click)="btnShowNextPositionClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="play-forward-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">
+              <ion-button [disabled]="autoplaying || chessboard.isShowingLatestPosition()"
+                (click)="btnShowLatestPositionClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+      <ion-fab #fab vertical="bottom" horizontal="end" slot="fixed">
+          <ion-fab-button color="light" size="small" [disabled]="autoplaying">
+            <ion-icon name="caret-up-outline"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-list side="top">
+              <ion-fab-button color="dark" (click)="btnCopyClipboardClick()"><ion-icon name="clipboard"></ion-icon></ion-fab-button>
+              <ion-fab-button color="dark" (click)="btnSettingsClick()"><ion-icon name="options"></ion-icon></ion-fab-button>
+            </ion-fab-list>
+        </ion-fab>
+    </div>
+  </div>
+</ion-content>

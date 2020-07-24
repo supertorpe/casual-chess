@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start" *ngIf="!isModal">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      {{'preferences.title' | translate}}
+    </ion-title>
+    <ion-buttons slot="end" *ngIf="isModal">
+      <ion-button (click)="btnCloseClick()"><ion-icon name="close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="configuration">
+    <ion-item (click)="toggleThemes()" class="clickable">
+      <ion-label>{{'preferences.color-theme' | translate}}</ion-label>
+      <ion-icon slot="end" [name]="showThemes ? 'caret-down-outline' : 'caret-forward-outline'" color="medium"></ion-icon>
+    </ion-item>
+    <ion-item [ngClass]="{'ion-hide': !showThemes}" *ngFor="let theme of themeSwitcherService.getThemes(); trackBy: trackFunc" color="{{configuration.colorTheme === theme.name ? 'light' : ''}}" button="true" (click)="selectTheme(theme.name)">
+      <div *ngNoCheck slot="start" class="dot" [ngStyle]="{'background-color': theme.mainColor}"></div>
+      <ion-label *ngNoCheck text-centered>{{theme.name}}</ion-label>
+    </ion-item>
+    <ion-item (click)="togglePieceThemes()" class="clickable">
+      <ion-label>{{'preferences.piece-theme' | translate}}</ion-label>
+      <ion-icon slot="end" [name]="showPieceThemes ? 'caret-down-outline' : 'caret-forward-outline'" color="medium"></ion-icon>
+    </ion-item>
+    <ion-item [ngClass]="{'ion-hide': !showPieceThemes}" *ngFor="let theme of pieceThemes; trackBy: trackFunc" color="{{configuration.pieceTheme === theme ? 'light' : ''}}" button="true" (click)="selectPieceTheme(theme)">
+      <ion-col size="2" *ngFor="let piece of ['P', 'B', 'N', 'R', 'Q', 'K']; trackBy: trackFunc">
+        <img *ngNoCheck class="big-thumbnail" ngxLazy="/assets/pieces/{{theme}}/w{{piece}}.svg" />
+      </ion-col>
+    </ion-item>
+    <ion-item (click)="toggleBoardThemes()" class="clickable">
+      <ion-label>{{'preferences.board-theme' | translate}}</ion-label>
+      <ion-icon slot="end" [name]="showBoardThemes ? 'caret-down-outline' : 'caret-forward-outline'" color="medium"></ion-icon>
+    </ion-item>
+    <ion-item [ngClass]="{'ion-hide': !showBoardThemes, 'clickable': true}" *ngFor="let chunk of boardThemeSwitcherService.getThemes() | chunks: 4; index as idxChunk; trackBy: trackFunc">
+      <ion-col *ngFor="let theme of chunk; index as idxChunk; trackBy: trackFunc" size="3" class="ion-text-center" [style.background-color]="getBoardBackground(theme.name)" (click)="selectBoardTheme(theme)" >
+        <img *ngNoCheck class="big-thumbnail" ngxLazy="/assets/board/{{theme.name}}.png" />
+      </ion-col>
+    </ion-item>
+    <ion-item class="clickable">
+      <ion-label>{{'preferences.play-sounds' | translate}}</ion-label>
+      <ion-toggle slot="end" [(ngModel)]="configuration.playSounds" color="medium"></ion-toggle>
+    </ion-item>
+    <ion-item class="clickable">
+      <ion-label>{{'preferences.highlight-squares' | translate}}</ion-label>
+      <ion-toggle slot="end" [(ngModel)]="configuration.highlightSquares" color="medium"></ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer>
+  <ion-button *ngIf="configuration" (click)="save()" color="primary" size="default" expand="full">
+    <ion-icon slot="start" name="save"></ion-icon>
+    <ion-label>{{'preferences.save-changes' | translate}}</ion-label>
+  </ion-button>
+</ion-footer>
