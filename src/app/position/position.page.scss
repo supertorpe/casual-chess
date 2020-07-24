@@ -23,13 +23,10 @@
 }
 .info {
     width: 100%;
-    display: table;
     min-height: calc(100% - 52px);
     max-height: calc(100% - 52px);
-}
-.innerinfo {
-    display: table-cell;
-    vertical-align: top;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 .action_buttons {
     width: 100%;

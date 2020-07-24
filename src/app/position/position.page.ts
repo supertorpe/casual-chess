@@ -182,7 +182,11 @@ export class PositionPage implements OnInit, OnDestroy {
   }
   private updateInfoText() {
     if (this.chessboard.isGameOver()) {
-      this.infotext = this.texts['position.gameover'];
+      if (this.chessboard.isCheckmated()) {
+        this.infotext = this.texts['position.gameover'];
+      } else {
+        this.infotext = this.texts['position.draw'];
+      }
     } else if (this.playerType == 'v') {
       this.infotext = (this.chessboard.turn() == 'w' ?
         this.texts['position.white-turn'] :
@@ -229,6 +233,7 @@ export class PositionPage implements OnInit, OnDestroy {
       'position.white-turn',
       'position.black-turn',
       'position.gameover',
+      'position.draw',
       'position.congratulations',
       'position.review',
       'position.fen-clipboard',

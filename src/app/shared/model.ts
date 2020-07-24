@@ -30,5 +30,7 @@ export interface Game {
     gameover: boolean,
     wdeleted: boolean,
     bdeleted: boolean,
-    turn? : string
+    turn? : string,
+    checkmated? : boolean
+
 }

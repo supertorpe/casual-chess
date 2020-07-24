@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title text-center class="padding-0">
-      <span class="responsive-text">{{infotext}}</span>
+      <span class="text-centered">{{infotext}}</span>
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -18,9 +18,7 @@
     </div>
     <div class="info_wrapper" *ngIf="game">
       <div class="info">
-        <div class="innerinfo">
-          <div>{{game.pgn}}</div>
-        </div>
+        {{game.pgn}}
       </div>
       <div class="action_buttons" *ngIf="game">
         <ion-grid>

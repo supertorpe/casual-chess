@@ -153,6 +153,10 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         return this.chess.game_over();
     }
 
+    isCheckmated() {
+        return this.chess.in_checkmate();
+    }
+
     pgn() {
         return this.chess.pgn();
     }

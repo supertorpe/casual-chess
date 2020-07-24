@@ -117,6 +117,7 @@ export class HomePage implements OnInit, OnDestroy {
                     //if (!game.gameover) {
                     chess.load_pgn(game.pgn);
                     game.turn = chess.turn();
+                    game.checkmated = chess.in_checkmate();
                     //}
                   });
                 }));
