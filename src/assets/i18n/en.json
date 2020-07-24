@@ -85,7 +85,6 @@
         "description": "Casual Chess is a free and open source project.",
         "source-code": "Source code",
         "third-party": "Following software and resources has been used:",
-        "eco-description": "Database of chess endgames",
         "chessjs-description": "A Javascript chess library for chess move generation/validation, piece placement/movement, and check/checkmate/draw detection",
         "chessboard-description": "A Javascript chess board",
         "multimedia-from": "Icons and Sounds from"
