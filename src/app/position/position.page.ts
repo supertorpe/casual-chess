@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, HostListener, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ConfigurationService, Configuration, Game, UtilsService, Player } from '../shared';
 import { Subscription } from 'rxjs';
@@ -11,6 +12,8 @@ import { ClipboardDialog } from './clipboard.dialog';
 import domtoimage from 'dom-to-image-hm';
 
 import { PreferencesPage } from '../preferences/preferences.page';
+
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-position',
@@ -24,9 +27,7 @@ export class PositionPage implements OnInit, OnDestroy {
   private configuration: Configuration;
   public game: Game;
   private gameLoaded = false;
-  private playerType: string;
-
-
+  public playerType: string;
 
   public fen: string;
   public move: string;
@@ -47,6 +48,7 @@ export class PositionPage implements OnInit, OnDestroy {
     private afs: AngularFirestore,
     private route: ActivatedRoute,
     private location: Location,
+    private http: HttpClient,
     private menuController: MenuController,
     public alertController: AlertController,
     public translate: TranslateService,
@@ -75,7 +77,7 @@ export class PositionPage implements OnInit, OnDestroy {
               }));
         }));
     });
-    
+
   }
 
   ngOnDestroy() {
@@ -239,6 +241,9 @@ export class PositionPage implements OnInit, OnDestroy {
       'position.fen-clipboard',
       'position.pgn-clipboard',
       'position.img-clipboard',
+      'position.img-bbcode-clipboard',
+      'position.img-capture',
+      'position.img-uploading',
       'position.in',
       'position.moves',
       'position.ups',
@@ -319,66 +324,67 @@ export class PositionPage implements OnInit, OnDestroy {
   }
 
   btnCopyClipboardClick() {
-    this.clipboardDialog().then(what => {
+    this.clipboardDialog().then(async what => {
       if (what) {
         if ('fen' == what) {
-          this.copyTextToClipboard(what, this.chessboard.fen());
+          this.copyToClipboard(what, this.chessboard.fen());
         } else if ('pgn' == what) {
-          this.copyTextToClipboard(what, this.chessboard.pgn());
-        } else if ('img' == what) {
-          domtoimage.toPng(document.getElementById('__chessboard__')).then(dataUrl => {
-            this.saveBase64AsFile(dataUrl, 'chessboard.png');
-
-            ///////
-/*
-            const el = document.createElement('img');
-            el.src = dataUrl;
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
-            document.body.appendChild(el);
-            const myrange = document.createRange();
-            myrange.setStartBefore(el);
-            myrange.setEndAfter(el);
-            myrange.selectNode(el);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(myrange);
-            document.execCommand('copy');
-            sel.removeAllRanges();
-            document.body.removeChild(el);
-            */
-            /*
-            const img = document.createElement('img');
-            img.src = dataUrl;
-
-            const div = document.createElement('div');
-            div.contentEditable = 'true';
-            div.appendChild(img);
-            document.body.appendChild(div);
-
-            // do copy
-
-            const doc = document;
-            // if (doc.body.createTextRange) {
-            //     var range = document.body.createTextRange();
-            //     range.moveToElementText(div);
-            //     range.select();
-            // } else if (window.getSelection) {
-                const selection = window.getSelection();
-                const range = document.createRange();
-                range.selectNodeContents(div);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            //}
-
-            document.execCommand('Copy');
-            document.body.removeChild(div);
-            ///////
-            */
+          this.copyToClipboard(what, this.chessboard.pgn());
+        } else if ('img' == what || 'img-bbcode' == what) {
+          const toast1 = await this.toast.create({
+            message: this.texts['position.img-capture'],
+            position: 'middle',
+            color: 'success'
+          });
+          toast1.present();
+          domtoimage.toPng(document.getElementById('__chessboard__')).then(async dataUrl => {
+            toast1.dismiss();
+            if ('img' == what) {
+              this.saveBase64AsFile(dataUrl, 'chessboard.png');
+            } else if ('img-bbcode' == what) {
+              const toast = await this.toast.create({
+                message: this.texts['position.img-uploading'],
+                position: 'middle',
+                color: 'success'
+              });
+              toast.present();
+              const self = this;
+              const img = new Image;
+              img.onload = function () {
+                const newDataUri = self.resizeImage(this, 350, 350);
+                const httpOptions = {
+                  headers: new HttpHeaders({
+                    'Authorization': 'Client-ID ' + environment.imgur.clientId,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  })
+                };
+                const data = {
+                  type: 'base64',
+                  name: 'chessboard.png',
+                  image: newDataUri.split(',')[1]
+                };
+                self.http.post<any>('https://api.imgur.com/3/image', data, httpOptions)
+                  .subscribe(response => {
+                    toast.dismiss();
+                    const bbcode = '[img]' + response.data.link + '[/img]';
+                    self.copyToClipboard(what, bbcode);
+                  });
+              };
+              img.src = dataUrl;
+            }
           });
         }
       }
     });
+  }
+
+  resizeImage(img, width, height) {
+    const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(img, 0, 0, width, height);
+    return canvas.toDataURL();
   }
 
   saveBase64AsFile(base64, fileName) {
@@ -390,16 +396,8 @@ export class PositionPage implements OnInit, OnDestroy {
     this.showToastClipboard('img');
   }
 
-  private copyTextToClipboard(what: string, text: string) {
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+  private copyToClipboard(what, text) {
+    navigator.clipboard.writeText(text);
     this.showToastClipboard(what);
   }
 
@@ -412,7 +410,6 @@ export class PositionPage implements OnInit, OnDestroy {
     });
     toast.present();
   }
-
 
   btnShowFirstPositionClick() {
     this.chessboard.showFirstPosition();

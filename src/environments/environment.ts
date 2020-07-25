@@ -12,6 +12,9 @@ export const environment = {
     storageBucket: "[STORAGE_BUCKET]",
     messagingSenderId: "[MESSAGING_SENDER_ID]",
     appId: "[APP_ID]"
+  },
+  imgur: {
+    clientId: "[CLIENT_ID]"
   }
 };
 

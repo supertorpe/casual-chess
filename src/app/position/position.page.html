@@ -22,14 +22,19 @@
       </div>
       <div class="action_buttons" *ngIf="game">
         <ion-grid>
-          <ion-row *ngIf="!game.gameover">
+          <ion-row *ngIf="!game.gameover && 'v' != playerType">
             <ion-col size="2">
               <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
                 <ion-icon slot="icon-only" name="sync"></ion-icon>
               </ion-button>
             </ion-col>
           </ion-row>
-          <ion-row *ngIf="game.gameover">
+          <ion-row *ngIf="game.gameover || 'v' == playerType">
+            <ion-col size="1">
+              <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="sync"></ion-icon>
+              </ion-button>
+            </ion-col>
             <ion-col size="2">
               <ion-button [disabled]="autoplaying || chessboard.isShowingFirstPosition()"
                 (click)="btnShowFirstPositionClick()" size="small" fill="clear" color="dark">

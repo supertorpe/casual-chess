@@ -21,10 +21,10 @@ export class ClipboardDialog {
     this.modalController.dismiss('pgn');
   }
   copyImg() {
+    this.modalController.dismiss('img-bbcode');
+  }
+  saveImg() {
     this.modalController.dismiss('img');
   }
-  //select(piece) {
-  //  this.modalController.dismiss({piece: piece});
-  //}
   
 }
