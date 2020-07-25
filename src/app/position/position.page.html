@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!embed">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -30,7 +30,7 @@
             </ion-col>
           </ion-row>
           <ion-row *ngIf="game.gameover || 'v' == playerType">
-            <ion-col size="1">
+            <ion-col size="2">
               <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
                 <ion-icon slot="icon-only" name="sync"></ion-icon>
               </ion-button>
@@ -71,7 +71,7 @@
           </ion-row>
         </ion-grid>
       </div>
-      <ion-fab #fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab #fab vertical="bottom" horizontal="end" slot="fixed" [ngClass]="{'ion-hide': embed}" style="bottom: 25px;">
           <ion-fab-button color="light" size="small" [disabled]="autoplaying">
             <ion-icon name="caret-up-outline"></ion-icon>
           </ion-fab-button>

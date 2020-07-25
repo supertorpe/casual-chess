@@ -1,5 +1,5 @@
 import { Component, ViewChildren, QueryList, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationStart } from '@angular/router';
 
 import { Platform, IonRouterOutlet, NavController, ToastController } from '@ionic/angular';
 
@@ -24,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private texts: any;
   private lastTimeBackPress = 0;
   private timePeriodToExit = 2000;
+  public hideMenu = false;
   private onConfigChangeSubscription: Subscription;
   @ViewChildren(IonRouterOutlet) routerOutlets: QueryList<IonRouterOutlet>;
 
@@ -74,6 +75,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private initializeApp() {
+    this.router.events.subscribe(evt => {
+      if (evt instanceof NavigationStart) {
+        if (evt.url.startsWith('/position') && evt.url.endsWith('embed=true'))
+          this.hideMenu = true;
+      }
+    });
     this.platform.backButton.subscribe(async () => {
       this.routerOutlets.forEach(async (outlet: IonRouterOutlet) => {
         this.goBack();

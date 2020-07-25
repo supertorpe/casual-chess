@@ -25,6 +25,7 @@ export class PositionPage implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   private configuration: Configuration;
+  public embed = false;
   public game: Game;
   private gameLoaded = false;
   public playerType: string;
@@ -61,6 +62,12 @@ export class PositionPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.configurationService.initialize().then(config => {
       this.configuration = config;
+      this.subscriptions.push(
+        this.route.queryParams
+        .subscribe(params => {
+          this.embed = (params.embed == 'true');
+        })
+      );
       this.subscriptions.push(
         this.route.params.subscribe(params => {
           this.playerType = params.id[0];

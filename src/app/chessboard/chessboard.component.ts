@@ -309,7 +309,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             else
                 message = this.texts['chessboard.game-over'];
             //this.pointer = this.chess.history().length - 1;
-            if (playsounds && this.configuration.playSounds) {
+            if (playsounds && this.configuration.playSounds && this.player != 'v') {
                 if (this.chess.in_checkmate() && this.player !== this.chess.turn()) {
                     this.playAudio('success');
                 } else {

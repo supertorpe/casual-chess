@@ -1,6 +1,6 @@
 <ion-app [ngClass]="{'ion-hide': !initialized}">
   <ion-split-pane contentId="main">
-    <ion-menu contentId="main">
+    <ion-menu contentId="main" *ngIf="!hideMenu">
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>{{'app.menu' | translate}}</ion-title>
