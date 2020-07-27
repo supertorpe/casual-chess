@@ -19,6 +19,8 @@
         "draw": "Draw",
         "your-turn": "Your turn",
         "not-your-turn": "Opponent's turn",
+        "white-turn": "White turn",
+        "black-turn": "Black turn",
         "in-progress": "In progress",
         "link-white-player": "Link for the player with the white pieces",
         "link-black-player": "Link for the player with the black pieces",

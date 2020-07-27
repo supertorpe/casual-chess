@@ -12,7 +12,8 @@ export interface Player {
     $key?: string,
     uid: string,
     pid: string,
-    name: string
+    name: string,
+    stars: string[]
 }
 
 export interface Game {

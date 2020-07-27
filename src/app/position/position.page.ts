@@ -64,9 +64,9 @@ export class PositionPage implements OnInit, OnDestroy {
       this.configuration = config;
       this.subscriptions.push(
         this.route.queryParams
-        .subscribe(params => {
-          this.embed = (params.embed == 'true');
-        })
+          .subscribe(params => {
+            this.embed = (params.embed == 'true');
+          })
       );
       this.subscriptions.push(
         this.route.params.subscribe(params => {
@@ -80,6 +80,29 @@ export class PositionPage implements OnInit, OnDestroy {
                 this.loadGame(data[0]);
                 this.initLocales();
               }));
+          if (this.playerType == 'v' && this.configuration.pid) {
+            this.subscriptions.push(
+              this.afs.collection<Player>('players', ref => {
+                return ref.where('pid', '==', this.configuration.pid)
+              })
+                .snapshotChanges()
+                .subscribe(players => {
+                  const playerData = players[0];
+                  const player = playerData.payload.doc.data();
+                  const playerKey = playerData.payload.doc.id;
+                  let mustUpdate = false;
+                  if (!player.hasOwnProperty('stars')) {
+                    player.stars = [params.id];
+                    mustUpdate = true;
+                  } else if (!player.stars.includes(params.id)) {
+                    player.stars.push(params.id);
+                    mustUpdate = true;
+                  }
+                  if (mustUpdate) {
+                    this.afs.collection<Player>('players').doc(playerKey).update(player);
+                  }
+                }));
+          }
         }));
     });
 
@@ -94,7 +117,8 @@ export class PositionPage implements OnInit, OnDestroy {
     const player: Player = {
       uid: null,
       pid: this.utils.uuidv4(),
-      name: null
+      name: null,
+      stars: []
     };
     this.afs.collection<Player>('players').add(player).then(result => {
       player.uid = result.id;

@@ -80,18 +80,29 @@ export class HomePage implements OnInit, OnDestroy {
             //     });
             //   });
             this.playerKey = players[0].uid;
+            const gamelist: Observable<Game[]>[] = [];
             const gamesAsWhitePlayer = this.afs.collection<Game>('games', ref => {
               return ref
                 .where('wpkey', '==', players[0].uid)
                 .where('wdeleted', '==', false)
             }).valueChanges();
+            gamelist.push(gamesAsWhitePlayer);
             const gamesAsBlackPlayer = this.afs.collection<Game>('games', ref => {
               return ref
                 .where('bpkey', '==', players[0].uid)
                 .where('bdeleted', '==', false)
             }).valueChanges();
+            gamelist.push(gamesAsBlackPlayer);
+            if (players[0].hasOwnProperty('stars')) {
+              players[0].stars.forEach(vid => {
+                gamelist.push(this.afs.collection<Game>('games', ref => {
+                  return ref
+                    .where('vid', '==', vid)
+                }).valueChanges());
+              });
+            }
             this.subscriptions.push(
-              combineLatest(gamesAsWhitePlayer, gamesAsBlackPlayer)
+              combineLatest(gamelist)
                 .pipe(
                   map(arr => arr
                     .reduce((acc, cur) => acc.concat(cur))
@@ -178,9 +189,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async delete(game) {
-
-
-
     const alert = await this.alertController.create({
       header: this.texts['home.delete-dialog.title'],
       subHeader: this.texts['home.delete-dialog.subtitle'],
@@ -208,11 +216,28 @@ export class HomePage implements OnInit, OnDestroy {
       ]
     });
     await alert.present();
+  }
 
-
-
-
-
+  removeStar(game: Game) {
+    this.subscriptions.push(
+      this.afs.collection<Player>('players', ref => {
+        return ref.where('pid', '==', this.configuration.pid)
+      })
+        .snapshotChanges()
+        .subscribe(players => {
+          const playerData = players[0];
+          const player = playerData.payload.doc.data();
+          const playerKey = playerData.payload.doc.id;
+          let mustUpdate = false;
+          if (player.hasOwnProperty('stars') && player.stars.includes(game.vid)) {
+            player.stars = player.stars.filter(item => item !== game.vid);
+            mustUpdate = true;
+            if (mustUpdate) {
+              this.afs.collection<Player>('players').doc(playerKey).update(player);
+            }
+          }
+        })
+    );
   }
 
   trackFunc(index: number, obj: any) {

@@ -19,6 +19,8 @@
         "draw": "Tablas",
         "your-turn": "Tu turno",
         "not-your-turn": "Esperando al oponente",
+        "white-turn": "Turno de blancas",
+        "black-turn": "Turno de negras",
         "in-progress": "En curso",
         "link-white-player": "Enlace para jugador de blancas",
         "link-black-player": "Enlace para jugador de negras",
