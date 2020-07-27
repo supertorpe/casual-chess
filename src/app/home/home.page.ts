@@ -58,15 +58,13 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   loadMyGames() {
+    const chess = new Chess();
     this.subscriptions.push(
       this.afs.collection<Player>('players', ref => {
         return ref.where('pid', '==', this.configuration.pid)
       })
-        .snapshotChanges()
-        .subscribe(data => {
-          const players: Player[] = data.map(item => {
-            return item.payload.doc.data();
-          });
+        .valueChanges()
+        .subscribe(players => {
           if (players != null && players.length > 0) {
             // players.forEach(player => {
 
@@ -86,20 +84,18 @@ export class HomePage implements OnInit, OnDestroy {
               return ref
                 .where('wpkey', '==', players[0].uid)
                 .where('wdeleted', '==', false)
-            }).snapshotChanges();
+            }).valueChanges();
             const gamesAsBlackPlayer = this.afs.collection<Game>('games', ref => {
               return ref
                 .where('bpkey', '==', players[0].uid)
                 .where('bdeleted', '==', false)
-            }).snapshotChanges();
+            }).valueChanges();
             this.subscriptions.push(
               combineLatest(gamesAsWhitePlayer, gamesAsBlackPlayer)
                 .pipe(
                   map(arr => arr
                     .reduce((acc, cur) => acc.concat(cur))
-                    .sort((a, b) => {
-                      const gameA = a.payload.doc.data();
-                      const gameB = b.payload.doc.data();
+                    .sort((gameA, gameB) => {
                       if (gameA.timestamp < gameB.timestamp)
                         return 1;
                       else if (gameA.timestamp > gameB.timestamp)
@@ -108,11 +104,8 @@ export class HomePage implements OnInit, OnDestroy {
                         return 0;
                     })
                   )
-                ).subscribe(gdata => {
-                  this.games = gdata.map(gitem => {
-                    return gitem.payload.doc.data();
-                  });
-                  const chess = new Chess();
+                ).subscribe(games => {
+                  this.games = games;
                   this.games.forEach(game => {
                     //if (!game.gameover) {
                     chess.load_pgn(game.pgn);

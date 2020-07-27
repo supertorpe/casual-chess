@@ -22,11 +22,13 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     private configuration: Configuration;
     private board: any;
     private chess: Chess = new Chess();
+    private auxChess : Chess = new Chess();
     private player: string;
     private pointer: number;
     private squareSelected;
     public texts: any;
     private sounds = [];
+    private chessHistory: any;
     private isMobileBrowser = false;
 
     @Output() warn: EventEmitter<string> = new EventEmitter<string>();
@@ -108,7 +110,8 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         const self = this;
         if (pgn != null) {
             this.chess.load_pgn(pgn);
-            this.pointer = this.chess.history().length - 1;
+            this.chessHistory = this.chess.history();
+            this.pointer = this.chessHistory.length - 1;
         } else {
             this.pointer =  -1;
         }
@@ -136,7 +139,8 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     update(pgn: string) {
         this.chess.load_pgn(pgn);
-        this.pointer = this.chess.history().length - 1;
+        this.chessHistory = this.chess.history();
+        this.pointer = this.chessHistory.length - 1;
         this.board.position(this.chess.fen());
         this.checkGameOver();
     }
@@ -171,7 +175,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     history() {
-        return this.chess.history();
+        return this.chessHistory;
     }
 
 
@@ -200,7 +204,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     showNextPosition() {
-        if (this.pointer === this.chess.history().length - 1) {
+        if (this.pointer === this.chessHistory.length - 1) {
             return;
         }
         this.pointer++;
@@ -208,7 +212,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     showLatestPosition() {
-        const historyLength = this.chess.history().length;
+        const historyLength = this.chessHistory.length;
         if (this.pointer === historyLength - 1) {
             return;
         }
@@ -221,7 +225,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     isShowingLatestPosition() {
-        return (this.pointer === this.chess.history().length - 1);
+        return (this.pointer === this.chessHistory.length - 1);
     }
 
     fen() {
@@ -233,11 +237,11 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
-        const auxChess = new Chess();
+        this.auxChess.reset();
         for (let i = 0; i <= this.pointer; i++) {
-            auxChess.move(this.chess.history()[i]);
+            this.auxChess.move(this.chessHistory[i]);
         }
-        this.board.position(auxChess.fen(), true);
+        this.board.position(this.auxChess.fen(), true);
     }
 
     private async promoteDialog(): Promise<string> {
@@ -329,6 +333,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             to: target,
             promotion: promotion
         });
+        this.chessHistory = this.chess.history();
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }

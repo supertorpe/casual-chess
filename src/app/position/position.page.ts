@@ -75,11 +75,9 @@ export class PositionPage implements OnInit, OnDestroy {
             this.afs.collection<Game>('games', ref => {
               return ref.where(`${this.playerType}id`, '==', params.id)
             })
-              .snapshotChanges()
+              .valueChanges()
               .subscribe(data => {
-                this.loadGame(data.map(item => {
-                  return item.payload.doc.data();
-                })[0]);
+                this.loadGame(data[0]);
                 this.initLocales();
               }));
         }));
@@ -113,9 +111,8 @@ export class PositionPage implements OnInit, OnDestroy {
   private loadPlayerFromGame() {
     // read player
     this.subscriptions.push(this.afs.doc<Player>('players/' + this.game[`${this.playerType}pkey`])
-      .snapshotChanges()
-      .subscribe(doc => {
-        const player = doc.payload.data() as Player;
+      .valueChanges()
+      .subscribe(player => {
         // update config
         this.configuration.pid = player.pid;
         this.configuration.name = player.name;
@@ -129,11 +126,8 @@ export class PositionPage implements OnInit, OnDestroy {
     this.subscriptions.push(this.afs.collection<Player>('players', ref => {
       return ref.where('pid', '==', this.configuration.pid)
     })
-      .snapshotChanges()
-      .subscribe(data => {
-        const players: Player[] = data.map(item => {
-          return item.payload.doc.data();
-        });
+      .valueChanges()
+      .subscribe(players => {
         if (players == null || players.length == 0) {
           // TO DO: when player not found
         } else {
@@ -148,11 +142,8 @@ export class PositionPage implements OnInit, OnDestroy {
     this.subscriptions.push(this.afs.collection<Player>('players', ref => {
       return ref.where('pid', '==', this.configuration.pid)
     })
-      .snapshotChanges()
-      .subscribe(data => {
-        const players: Player[] = data.map(item => {
-          return item.payload.doc.data();
-        });
+      .valueChanges()
+      .subscribe(players => {
         if (players == null || players.length == 0) {
           // TO DO: when player not found
         } else //if ((this.playerType == 'w' && this.game.wpkey != players[0].uid) || (this.playerType == 'b' && this.game.bpkey != players[0].uid)) {
