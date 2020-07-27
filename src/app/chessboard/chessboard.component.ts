@@ -17,12 +17,12 @@ declare var ChessBoard: any;
 })
 export class ChessboardComponent implements OnInit, OnDestroy {
 
-    private subscriptions : Subscription[] = [];
+    private subscriptions: Subscription[] = [];
 
     private configuration: Configuration;
     private board: any;
     private chess: Chess = new Chess();
-    private auxChess : Chess = new Chess();
+    private auxChess: Chess = new Chess();
     private player: string;
     private pointer: number;
     private squareSelected;
@@ -113,7 +113,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             this.chessHistory = this.chess.history();
             this.pointer = this.chessHistory.length - 1;
         } else {
-            this.pointer =  -1;
+            this.pointer = -1;
         }
         if (this.board) {
             this.board.destroy();
@@ -229,7 +229,24 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     fen() {
-        return this.chess.fen();
+        const numMovs = this.chessHistory.length;
+        if (this.pointer == numMovs - 1) {
+            return this.chess.fen();
+        } else {
+            if (this.pointer >= numMovs / 2) {
+                this.auxChess.load_pgn(this.chess.pgn());
+                const movsToDelete = (numMovs - this.pointer);
+                for (let i = 1; i < movsToDelete; i++) {
+                    this.auxChess.undo();
+                }
+            } else {
+                this.auxChess.reset();
+                for (let i = 0; i <= this.pointer; i++) {
+                    this.auxChess.move(this.chessHistory[i]);
+                }
+            }
+            return this.auxChess.fen();
+        }
     }
 
     private showFenPointer() {
@@ -237,11 +254,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
-        this.auxChess.reset();
-        for (let i = 0; i <= this.pointer; i++) {
-            this.auxChess.move(this.chessHistory[i]);
-        }
-        this.board.position(this.auxChess.fen(), true);
+        this.board.position(this.fen(), true);
     }
 
     private async promoteDialog(): Promise<string> {
