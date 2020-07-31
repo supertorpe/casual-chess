@@ -31,6 +31,7 @@ export class PositionPage implements OnInit, OnDestroy {
   public playerType: string;
 
   public fen: string;
+  public parsedPgn: string[][];
   public move: string;
   public idx = 1;
   public targetImage = '';
@@ -199,8 +200,10 @@ export class PositionPage implements OnInit, OnDestroy {
         }
       }
       this.chessboard.build(game.pgn, this.playerType);
+      this.parsePgn(game.pgn);
     } else {
       this.chessboard.update(game.pgn);
+      this.parsePgn(game.pgn);
       this.updateInfoText();
     }
   }
@@ -288,6 +291,7 @@ export class PositionPage implements OnInit, OnDestroy {
 
   onPlayerMoved() {
     this.game.pgn = this.chessboard.pgn();
+    this.parsePgn(this.game.pgn);
     this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
   }
 
@@ -498,4 +502,21 @@ export class PositionPage implements OnInit, OnDestroy {
     }
   }
 
+  parsePgn(pgn: string) {
+    this.parsedPgn = [];
+    if (pgn == '')
+      return;
+    const parts = pgn.split('.');
+    let pos = 0;
+    parts.forEach(part => {
+      if (pos > 0) {
+        let moves = part.trim().split(' ', 2);
+        this.parsedPgn.push(moves);
+      }
+      pos++;
+    });
+  }
+  trackFunc(index: number, obj: any) {
+    return index;
+  }
 }

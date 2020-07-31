@@ -187,11 +187,20 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         }
     }
 
+    currentPosition() {
+        return this.pointer;
+    }
+
     showFirstPosition() {
         if (this.pointer === -1) {
             return;
         }
         this.pointer = -1;
+        this.showFenPointer();
+    }
+
+    showPosition(idx) {
+        this.pointer = idx;
         this.showFenPointer();
     }
 
