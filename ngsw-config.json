@@ -3,7 +3,7 @@
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "app",
+      "name": "Casual Chess",
       "installMode": "prefetch",
       "resources": {
         "files": [
