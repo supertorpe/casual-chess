@@ -22,6 +22,10 @@ const routes: Routes = [
   {
     path: 'position/:id',
     loadChildren: () => import('./position/position.module').then( m => m.PositionPageModule)
+  },
+  {
+    path: 'analysis/:fen1/:fen2/:fen3/:fen4/:fen5/:fen6/:fen7/:fen8',
+    loadChildren: () => import('./analysis/analysis.module').then( m => m.AnalisysPageModule)
   }
 ];
 

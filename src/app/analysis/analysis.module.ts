@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../shared';
-import { PositionPage } from './position.page';
-import { ChessboardComponent } from '../chessboard';
+import { AnalysisPage } from './analysis.page';
+import { AnalysisChessboardComponent } from '../chessboard';
 
 @NgModule({
   imports: [
@@ -10,11 +10,11 @@ import { ChessboardComponent } from '../chessboard';
     RouterModule.forChild([
       {
         path: '',
-        component: PositionPage
+        component: AnalysisPage
       }
     ])
   ],
-  declarations: [PositionPage,ChessboardComponent],
+  declarations: [AnalysisPage,AnalysisChessboardComponent],
   entryComponents: []
 })
-export class PositionPageModule {}
+export class AnalisysPageModule {}

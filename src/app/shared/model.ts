@@ -33,5 +33,12 @@ export interface Game {
     bdeleted: boolean,
     turn? : string,
     checkmated? : boolean
-
+}
+// https://gist.github.com/arniebradfo/5cf89c362cc216df6fc1d9ca4d536b72
+export interface MoveTree {
+    parent: MoveTree,
+    children: MoveTree[],
+    level: number,
+    move: string,
+    fen: string
 }

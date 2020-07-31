@@ -3,11 +3,11 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { ConfigurationService, Configuration, Game, UtilsService, Player } from '../shared';
+import { ConfigurationService, Configuration, UtilsService, MoveTree } from '../shared';
 import { Subscription } from 'rxjs';
 import { AlertController, MenuController, ToastController, ModalController, Platform, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ChessboardComponent } from '../chessboard';
+import { AnalysisChessboardComponent } from '../chessboard';
 import { ClipboardDialog } from '../dialogs/clipboard.dialog';
 import domtoimage from 'dom-to-image-hm';
 
@@ -16,34 +16,29 @@ import { PreferencesPage } from '../preferences/preferences.page';
 import { environment } from '../../environments/environment';
 
 @Component({
-  selector: 'app-position',
-  templateUrl: 'position.page.html',
-  styleUrls: ['position.page.scss']
+  selector: 'app-analysis',
+  templateUrl: 'analysis.page.html',
+  styleUrls: ['analysis.page.scss']
 })
-export class PositionPage implements OnInit, OnDestroy {
+export class AnalysisPage implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
   private configuration: Configuration;
-  private id;
   public embed = false;
-  public game: Game;
-  private gameLoaded = false;
-  public playerType: string;
+  public returnUrl: string;
+  public moveTree: MoveTree;
+  public currentMove: MoveTree;
+
 
   public fen: string;
-  public parsedPgn: string[][];
-  public move: string;
-  public idx = 1;
-  public targetImage = '';
   public infotext = '';
   public btnFlipEnabled = false;
   public gameOverMessage: string;
-  public autoplaying = false;
   public intervalPlay;
   public texts: any;
 
-  @ViewChild('chessboard', { static: true }) chessboard: ChessboardComponent;
+  @ViewChild('chessboard', { static: true }) chessboard: AnalysisChessboardComponent;
   @ViewChild('fab', { static: true }) fab: any;
 
   constructor(
@@ -67,47 +62,16 @@ export class PositionPage implements OnInit, OnDestroy {
         this.route.queryParams
           .subscribe(params => {
             this.embed = (params.embed == 'true');
+            this.returnUrl = params.returnUrl;
           })
       );
       this.subscriptions.push(
-        this.route.params.subscribe(params => {
-          this.id = params.id;
-          this.playerType = params.id[0];
-          this.subscriptions.push(
-            this.afs.collection<Game>('games', ref => {
-              return ref.where(`${this.playerType}id`, '==', params.id)
-            })
-              .valueChanges()
-              .subscribe(data => {
-                this.loadGame(data[0]);
-                this.initLocales();
-              }));
-          if (this.playerType == 'v' && this.configuration.pid) {
-            this.subscriptions.push(
-              this.afs.collection<Player>('players', ref => {
-                return ref.where('pid', '==', this.configuration.pid)
-              })
-                .snapshotChanges()
-                .subscribe(players => {
-                  const playerData = players[0];
-                  const player = playerData.payload.doc.data();
-                  const playerKey = playerData.payload.doc.id;
-                  let mustUpdate = false;
-                  if (!player.hasOwnProperty('stars')) {
-                    player.stars = [params.id];
-                    mustUpdate = true;
-                  } else if (!player.stars.includes(params.id)) {
-                    player.stars.push(params.id);
-                    mustUpdate = true;
-                  }
-                  if (mustUpdate) {
-                    this.afs.collection<Player>('players').doc(playerKey).update(player);
-                  }
-                }));
-          }
-        }));
+        this.route.params
+          .subscribe(params => {
+            this.loadFen(`${params.fen1}/${params.fen2}/${params.fen3}/${params.fen4}/${params.fen5}/${params.fen6}/${params.fen7}/${params.fen8}`);
+          })
+      );
     });
-
   }
 
   ngOnDestroy() {
@@ -115,99 +79,20 @@ export class PositionPage implements OnInit, OnDestroy {
     this.subscriptions = [];
   }
 
-  private createPlayer() {
-    const player: Player = {
-      uid: null,
-      pid: this.utils.uuidv4(),
-      name: null,
-      stars: []
+  loadFen(fen: string) {
+    this.fen = fen;
+    this.chessboard.build(fen);
+    this.initLocales();
+    this.moveTree = {
+      parent: null,
+      children: [],
+      level: 0,
+      move: '[0]',
+      fen: fen
     };
-    this.afs.collection<Player>('players').add(player).then(result => {
-      player.uid = result.id;
-      this.afs.collection<Player>('players').doc(result.id).update(player).then(() => {
-        // player created: update config
-        this.configuration.pid = player.pid;
-        this.configurationService.save();
-        this.game[`${this.playerType}pkey`] = player.uid;
-        this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-      });
-    });
+    this.currentMove = this.moveTree;
   }
 
-  private loadPlayerFromGame() {
-    // read player
-    this.subscriptions.push(this.afs.doc<Player>('players/' + this.game[`${this.playerType}pkey`])
-      .valueChanges()
-      .subscribe(player => {
-        // update config
-        this.configuration.pid = player.pid;
-        this.configuration.name = player.name;
-        this.configurationService.save();
-      }));
-    // TO DO : when player not found
-  }
-
-  private setGamePlayer() {
-    // get player data
-    this.subscriptions.push(this.afs.collection<Player>('players', ref => {
-      return ref.where('pid', '==', this.configuration.pid)
-    })
-      .valueChanges()
-      .subscribe(players => {
-        if (players == null || players.length == 0) {
-          // TO DO: when player not found
-        } else {
-          this.game[`${this.playerType}pkey`] = players[0].uid;
-          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-        }
-      }));
-  }
-
-  private checkGamePlayer() {
-    // get player data
-    this.subscriptions.push(this.afs.collection<Player>('players', ref => {
-      return ref.where('pid', '==', this.configuration.pid)
-    })
-      .valueChanges()
-      .subscribe(players => {
-        if (players == null || players.length == 0) {
-          // TO DO: when player not found
-        } else //if ((this.playerType == 'w' && this.game.wpkey != players[0].uid) || (this.playerType == 'b' && this.game.bpkey != players[0].uid)) {
-          if (this.game[`${this.playerType}pkey`] != players[0].uid) {
-            // resync player uid
-            this.game[`${this.playerType}pkey`] = players[0].uid;
-            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-          }
-      }));
-    // TO DO: when player not found
-  }
-
-  private loadGame(game: Game) {
-    this.game = game;
-    if (!this.gameLoaded) {
-      this.gameLoaded = true;
-      // set player pid and name
-      if (this.playerType !== 'v') {
-        if (this.configuration.pid == null) {
-          if (game[`${this.playerType}pkey`] == null) {
-            this.createPlayer();
-          } else {
-            this.loadPlayerFromGame();
-          }
-        } else if (game[`${this.playerType}pkey`] == null) {
-          this.setGamePlayer();
-        } else {
-          this.checkGamePlayer();
-        }
-      }
-      this.chessboard.build(game.pgn, this.playerType);
-      this.parsePgn(game.pgn);
-    } else {
-      this.chessboard.update(game.pgn);
-      this.parsePgn(game.pgn);
-      this.updateInfoText();
-    }
-  }
   private updateInfoText() {
     if (this.chessboard.isGameOver()) {
       if (this.chessboard.isCheckmated()) {
@@ -215,15 +100,11 @@ export class PositionPage implements OnInit, OnDestroy {
       } else {
         this.infotext = this.texts['position.draw'];
       }
-    } else if (this.playerType == 'v') {
+    } else {
       this.infotext = (this.chessboard.turn() == 'w' ?
         this.texts['position.white-turn'] :
         this.texts['position.black-turn']
       );
-    } else if (this.chessboard.turn() == this.playerType) {
-      this.infotext = this.texts['position.your-turn'];
-    } else {
-      this.infotext = this.texts['position.not-your-turn'];
     }
   }
   ionViewWillEnter() {
@@ -231,7 +112,6 @@ export class PositionPage implements OnInit, OnDestroy {
   }
 
   ionViewWillLeave() {
-    this.stopAutoplay();
     this.menuController.swipeGesture(true);
   }
 
@@ -290,16 +170,44 @@ export class PositionPage implements OnInit, OnDestroy {
     toast.present();
   }
 
-  onPlayerMoved() {
-    this.game.pgn = this.chessboard.pgn();
-    this.parsePgn(this.game.pgn);
-    this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+  onPlayerMoved(movement) {
+    // If the move already exists in the list, just change the pointer
+    const aux = this.currentMove.children.find(item => {return item.move == movement});
+    if (aux) {
+      this.currentMove = aux;
+    } else {
+      const move: MoveTree = {
+        parent: this.currentMove,
+        children: [],
+        level: this.currentMove.level + 1,
+        move: movement,
+        fen: this.chessboard.fen()
+      };
+      this.currentMove.children.push(move);
+      this.currentMove = move;
+    }
+    this.updateInfoText();
+  }
+
+  btnRemoveClick() {
+    const parent = this.currentMove.parent;
+    parent.children.splice(parent.children.findIndex(item => item.fen == this.currentMove.fen), 1);
+    if (parent.children.length > 0) {
+      this.currentMove = parent.children[parent.children.length - 1];
+    } else {
+      this.currentMove = parent;
+    }
+    this.chessboard.showFen(this.currentMove.fen);
   }
 
   async onGameOver(message) {
     this.infotext = message;
-    this.game.gameover = true;
-    this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+    //this.game.gameover = true;
+  }
+
+  showMove(move: MoveTree) {
+    this.currentMove = move;
+    this.chessboard.showFen(move.fen);
   }
 
   private async settingsDialog(): Promise<Configuration> {
@@ -329,10 +237,17 @@ export class PositionPage implements OnInit, OnDestroy {
     this.chessboard.flip();
   }
 
+  btnReturnClick() {
+    this.navCtrl.navigateRoot(this.returnUrl);
+  }
+
   private async clipboardDialog(): Promise<string> {
     return new Promise<string>(async resolve => {
       const modal = await this.modalController.create({
-        component: ClipboardDialog
+        component: ClipboardDialog,
+        componentProps: {
+          'showPGN': false
+        }
       });
       modal.present();
       const { data } = await modal.onDidDismiss();
@@ -349,8 +264,6 @@ export class PositionPage implements OnInit, OnDestroy {
       if (what) {
         if ('fen' == what) {
           this.copyToClipboard(what, this.chessboard.fen());
-        } else if ('pgn' == what) {
-          this.copyToClipboard(what, this.chessboard.pgn());
         } else if ('img' == what || 'img-bbcode' == what) {
           const toast1 = await this.toast.create({
             message: this.texts['position.img-capture'],
@@ -358,7 +271,7 @@ export class PositionPage implements OnInit, OnDestroy {
             color: 'success'
           });
           toast1.present();
-          domtoimage.toPng(document.getElementById('__chessboard__')).then(async dataUrl => {
+          domtoimage.toPng(document.getElementById('__analysis-chessboard__')).then(async dataUrl => {
             toast1.dismiss();
             if ('img' == what) {
               this.saveBase64AsFile(dataUrl, 'chessboard.png');
@@ -431,7 +344,6 @@ export class PositionPage implements OnInit, OnDestroy {
       document.execCommand('copy');
       document.body.removeChild(el);
     }
-
     this.showToastClipboard(what);
   }
 
@@ -445,76 +357,6 @@ export class PositionPage implements OnInit, OnDestroy {
     toast.present();
   }
 
-  btnShowFirstPositionClick() {
-    this.chessboard.showFirstPosition();
-  }
-
-  btnShowPreviousPositionClick() {
-    this.chessboard.showPreviousPosition();
-  }
-
-  btnShowNextPositionClick() {
-    this.chessboard.showNextPosition();
-  }
-
-  btnShowLatestPositionClick() {
-    this.chessboard.showLatestPosition();
-  }
-
-  btnPlayClick() {
-    //if (this.fab.activated) this.fab.close();
-    const self = this;
-    this.autoplaying = true;
-    if (this.internalPlay()) {
-      this.intervalPlay = setInterval(function () {
-        if (!self.internalPlay()) {
-          clearInterval(self.intervalPlay);
-          self.intervalPlay = null;
-        }
-      }, 1000);
-    }
-  }
-
-  internalPlay() {
-    this.chessboard.showNextPosition();
-    if (this.chessboard.isShowingLatestPosition()) {
-      this.autoplaying = false;
-      return false;
-    }
-    return true;
-  }
-
-  btnPauseClick() {
-    this.autoplaying = false;
-    clearInterval(this.intervalPlay);
-  }
-
-  private stopAutoplay() {
-    if (this.intervalPlay) {
-      clearInterval(this.intervalPlay);
-      this.intervalPlay = null;
-      this.autoplaying = false;
-    }
-  }
-
-  btnAnalysisClick() {
-    this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?returnUrl=/position/' + this.id);
-  }
-
-  parsePgn(pgn: string) {
-    this.parsedPgn = [];
-    if (pgn == '')
-      return;
-    const parts = pgn.split('.');
-    let pos = 0;
-    parts.forEach(part => {
-      if (pos > 0) {
-        let moves = part.trim().split(' ', 2);
-        this.parsedPgn.push(moves);
-      }
-      pos++;
-    });
-  }
   trackFunc(index: number, obj: any) {
     return index;
   }

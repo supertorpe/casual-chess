@@ -12,7 +12,7 @@
                 </ion-button>
             </ion-col>
         </ion-row>
-        <ion-row>
+        <ion-row *ngIf="showPGN">
             <ion-col>
                 <ion-button (click)="copyPgn()" color="light" size="large" expand="full">
                     <ion-icon slot="start" name="clipboard"></ion-icon><ion-label>PGN</ion-label>

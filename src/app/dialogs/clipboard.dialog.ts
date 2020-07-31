@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class ClipboardDialog {
 
-  @Input() turn: string;
+  @Input() showPGN: boolean;
 
   constructor(public modalController: ModalController, public translate: TranslateService) {
   }

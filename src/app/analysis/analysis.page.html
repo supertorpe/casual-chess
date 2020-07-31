@@ -1,0 +1,66 @@
+<ion-header *ngIf="!embed">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title text-center class="padding-0">
+      <span class="text-centered">{{infotext}}</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="container">
+    <div class="board_wrapper" id="board-wrapper">
+      <analysis-chessboard #chessboard 
+        (warn)="onWarn($event)" (playerMoved)="onPlayerMoved($event)"
+        (gameOver)="onGameOver($event)">
+      </analysis-chessboard>
+    </div>
+    <div class="info_wrapper" *ngIf="moveTree">
+      <div class="info">
+        <ion-label style="cursor:pointer; font-weight: {{(currentMove.fen == moveTree.fen) ? 'bold' : 'normal'}}" (click)="showMove(moveTree)">{{'position.start' | translate}} &gt; </ion-label>
+        <ng-template #recursiveList let-list>
+          <ng-container *ngFor="let item of list; let order = index">
+            {{list.length > 1 && order == 0 ? '(' : ''}} {{list.length > 1 && order > 0 ? '|' : ''}} <ion-label style="cursor:pointer; font-weight: {{(currentMove.fen == item.fen) ? 'bold' : 'normal'}}" (click)="showMove(item)">{{item.move}} </ion-label>
+            <ng-container *ngIf="item.children.length > 0">
+              <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: item.children }"></ng-container>
+            </ng-container>
+            {{list.length > 1 && order == list.length - 1 ? ')' : ''}}
+          </ng-container>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: moveTree.children }"></ng-container>
+      </div>
+      <div class="action_buttons">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="2">
+              <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="sync"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2">
+              <ion-button (click)="btnRemoveClick()" [disabled]="moveTree.fen == currentMove.fen" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="cut-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" *ngIf="returnUrl">
+              <ion-button (click)="btnReturnClick()" size="small" fill="clear" color="dark">
+                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+            
+          </ion-row>
+        </ion-grid>
+      </div>
+      <ion-fab #fab vertical="bottom" horizontal="end" slot="fixed" [ngClass]="{'ion-hide': embed}" style="bottom: 25px;">
+          <ion-fab-button color="light" size="small">
+            <ion-icon name="caret-up-outline"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-list side="top">
+              <ion-fab-button color="dark" (click)="btnCopyClipboardClick()"><ion-icon name="clipboard"></ion-icon></ion-fab-button>
+              <ion-fab-button color="dark" (click)="btnSettingsClick()"><ion-icon name="options"></ion-icon></ion-fab-button>
+          </ion-fab-list>
+      </ion-fab>
+    </div>
+  </div>
+</ion-content>

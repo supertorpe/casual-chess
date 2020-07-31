@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfigurationService, Configuration } from '../shared';
+import { Configuration } from '../shared/model';
+import { ConfigurationService } from '../shared/configuration.service';
 
 @Component({
   selector: 'chessboard-promotion',

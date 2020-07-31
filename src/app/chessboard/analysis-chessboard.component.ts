@@ -11,28 +11,26 @@ import { ConfigurationService, Configuration } from '../shared';
 declare var ChessBoard: any;
 
 @Component({
-    selector: 'chessboard',
-    templateUrl: 'chessboard.component.html',
-    styleUrls: ['chessboard.component.scss'],
+    selector: 'analysis-chessboard',
+    templateUrl: 'analysis-chessboard.component.html',
+    styleUrls: ['analysis-chessboard.component.scss'],
 })
-export class ChessboardComponent implements OnInit, OnDestroy {
+export class AnalysisChessboardComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
     private configuration: Configuration;
     private board: any;
     private chess: Chess = new Chess();
-    private auxChess: Chess = new Chess();
+    
     private player: string;
-    private pointer: number;
     private squareSelected;
     public texts: any;
     private sounds = [];
-    private chessHistory: any;
     private isMobileBrowser = false;
 
     @Output() warn: EventEmitter<string> = new EventEmitter<string>();
-    @Output() playerMoved: EventEmitter<void> = new EventEmitter<void>();
+    @Output() playerMoved: EventEmitter<string> = new EventEmitter<string>();
     @Output() gameOver: EventEmitter<string> = new EventEmitter<string>();
 
     constructor(
@@ -106,20 +104,15 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         if (this.board) this.board.resize(event);
     }
 
-    build(pgn: string, player: string) {
+    build(fen: string) {
         const self = this;
-        if (pgn != null) {
-            this.chess.load_pgn(pgn);
-            this.chessHistory = this.chess.history();
-            this.pointer = this.chessHistory.length - 1;
-        } else {
-            this.pointer = -1;
-        }
         if (this.board) {
             this.board.destroy();
         }
-        this.board = ChessBoard('__chessboard__', {
-            position: this.chess.fen(),
+        this.chess.load(fen);
+        this.player = this.chess.turn();
+        this.board = ChessBoard('__analysis-chessboard__', {
+            position: fen,
             pieceTheme: function (piece) { return '/assets/pieces/' + self.configuration.pieceTheme + '/' + piece + '.svg' },
             draggable: true,
             onDragStart: function (source, piece, position, orientation) { return self.onDragStart(source, piece, position, orientation); },
@@ -129,24 +122,16 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             onMouseoverSquare: function (square, piece, position, orientation) { self.onMouseoverSquare(square, piece, position, orientation); },
             onSnapEnd: function (source, target, piece) { self.onSnapEnd(source, target, piece); }
         });
-        if (player == 'b') {
-            this.flip();
-        }
         this.cleanHighlights();
-        this.player = player;
         this.uglyForceBoardRedraw();
-    }
-
-    update(pgn: string) {
-        this.chess.load_pgn(pgn);
-        this.chessHistory = this.chess.history();
-        this.pointer = this.chessHistory.length - 1;
-        this.board.position(this.chess.fen());
-        this.checkGameOver();
     }
 
     flip() {
         this.board.flip();
+    }
+
+    fen() {
+        return this.chess.fen();
     }
 
     turn() {
@@ -161,15 +146,6 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         return this.chess.in_checkmate();
     }
 
-    pgn() {
-        return this.chess.pgn();
-    }
-
-    history() {
-        return this.chessHistory;
-    }
-
-
     winner() {
         if (this.chess.in_checkmate()) {
             return (this.chess.turn() === 'w' ? 'black' : 'white');
@@ -178,83 +154,14 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    currentPosition() {
-        return this.pointer;
-    }
-
-    showFirstPosition() {
-        if (this.pointer === -1) {
-            return;
-        }
-        this.pointer = -1;
-        this.showFenPointer();
-    }
-
-    showPosition(idx) {
-        this.pointer = idx;
-        this.showFenPointer();
-    }
-
-    showPreviousPosition() {
-        if (this.pointer === -1) {
-            return;
-        }
-        this.pointer--;
-        this.showFenPointer();
-    }
-
-    showNextPosition() {
-        if (this.pointer === this.chessHistory.length - 1) {
-            return;
-        }
-        this.pointer++;
-        this.showFenPointer();
-    }
-
-    showLatestPosition() {
-        const historyLength = this.chessHistory.length;
-        if (this.pointer === historyLength - 1) {
-            return;
-        }
-        this.pointer = historyLength - 1;
-        this.showFenPointer();
-    }
-
-    isShowingFirstPosition() {
-        return (this.pointer === -1);
-    }
-
-    isShowingLatestPosition() {
-        return (this.pointer === this.chessHistory.length - 1);
-    }
-
-    fen() {
-        const numMovs = this.chessHistory.length;
-        if (this.pointer == numMovs - 1) {
-            return this.chess.fen();
-        } else {
-            if (this.pointer >= numMovs / 2) {
-                this.auxChess.load_pgn(this.chess.pgn());
-                const movsToDelete = (numMovs - this.pointer);
-                for (let i = 1; i < movsToDelete; i++) {
-                    this.auxChess.undo();
-                }
-            } else {
-                this.auxChess.reset();
-                for (let i = 0; i <= this.pointer; i++) {
-                    this.auxChess.move(this.chessHistory[i]);
-                }
-            }
-            return this.auxChess.fen();
-        }
-    }
-
-    private showFenPointer() {
+    public showFen(fen) {
         this.cleanHighlights();
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
-        this.board.position(this.fen(), true);
+        this.board.position(fen, true);
+        this.chess.load(fen);
+        this.player = this.chess.turn();
     }
 
     private async promoteDialog(): Promise<string> {
@@ -325,9 +232,8 @@ export class ChessboardComponent implements OnInit, OnDestroy {
                 message = this.texts['chessboard.rule-fifty'];
             else
                 message = this.texts['chessboard.game-over'];
-            //this.pointer = this.chess.history().length - 1;
-            if (playsounds && this.configuration.playSounds && this.player != 'v') {
-                if (this.chess.in_checkmate() && this.player !== this.chess.turn()) {
+            if (playsounds && this.configuration.playSounds) {
+                if (this.chess.in_checkmate() ) {
                     this.playAudio('success');
                 } else {
                     this.playAudio('fail');
@@ -346,15 +252,14 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             to: target,
             promotion: promotion
         });
-        this.chessHistory = this.chess.history();
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
-        //this.fenHistory.push(this.chess.fen());
-        this.pointer++;
-
-        this.playerMoved.emit();
-        this.checkGameOver(false);
+        const history = this.chess.history();
+        this.playerMoved.emit(history[history.length - 1]);
+        if (!this.checkGameOver(false)) {
+            this.player = (this.player == 'w' ? 'b' : 'w');
+        }
     }
 
     private onMoveEnd(source, target) {
@@ -413,7 +318,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         if (!this.configuration.highlightSquares) {
             return;
         }
-        const squareEl = document.querySelector(`#__chessboard__ .square-${square}`) as HTMLElement;
+        const squareEl = document.querySelector(`#__analysis-chessboard__ .square-${square}`) as HTMLElement;
         if (squareEl.classList.contains('black-3c85d')) {
             squareEl.classList.add('move-dest-black');
         } else {

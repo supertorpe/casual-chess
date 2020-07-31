@@ -1,2 +1,2 @@
 export * from './chessboard.component';
-export * from './promotion.dialog';
+export * from './analysis-chessboard.component';
