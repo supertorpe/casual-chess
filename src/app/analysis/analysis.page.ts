@@ -199,6 +199,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       this.currentMove = parent;
     }
     this.chessboard.showFen(this.currentMove.fen);
+    this.updateInfoText();
   }
 
   async onGameOver(message) {
@@ -209,6 +210,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
   showMove(move: MoveTree) {
     this.currentMove = move;
     this.chessboard.showFen(move.fen);
+    this.updateInfoText();
   }
 
   private async settingsDialog(): Promise<Configuration> {
