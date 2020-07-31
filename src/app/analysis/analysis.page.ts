@@ -29,13 +29,10 @@ export class AnalysisPage implements OnInit, OnDestroy {
   public returnUrl: string;
   public moveTree: MoveTree;
   public currentMove: MoveTree;
-
-
   public fen: string;
   public infotext = '';
   public btnFlipEnabled = false;
   public gameOverMessage: string;
-  public intervalPlay;
   public texts: any;
 
   @ViewChild('chessboard', { static: true }) chessboard: AnalysisChessboardComponent;
@@ -81,12 +78,15 @@ export class AnalysisPage implements OnInit, OnDestroy {
 
   loadFen(fen: string) {
     this.fen = fen;
+    const parts = fen.split(' ');
+    const num : number = +parts[parts.length - 1];
     this.chessboard.build(fen);
     this.initLocales();
     this.moveTree = {
       parent: null,
       children: [],
       level: 0,
+      order: num - 1,
       move: '[0]',
       fen: fen
     };
@@ -181,6 +181,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
         children: [],
         level: this.currentMove.level + 1,
         move: movement,
+        order: this.currentMove.order + (this.chessboard.turn() == 'b' ? 1 : 0),
         fen: this.chessboard.fen()
       };
       this.currentMove.children.push(move);

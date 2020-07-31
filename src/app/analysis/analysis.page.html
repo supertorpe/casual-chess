@@ -18,10 +18,10 @@
     </div>
     <div class="info_wrapper" *ngIf="moveTree">
       <div class="info">
-        <ion-label style="cursor:pointer; font-weight: {{(currentMove.fen == moveTree.fen) ? 'bold' : 'normal'}}" (click)="showMove(moveTree)">{{'position.start' | translate}} &gt; </ion-label>
+        <ion-label style="cursor:pointer; font-family:Arial, Helvetica, sans-serif; font-weight: {{(currentMove.fen == moveTree.fen) ? 'bold' : 'normal'}}" (click)="showMove(moveTree)">{{'position.start' | translate}} &gt; </ion-label>
         <ng-template #recursiveList let-list>
           <ng-container *ngFor="let item of list; let order = index">
-            {{list.length > 1 && order == 0 ? '(' : ''}} {{list.length > 1 && order > 0 ? '|' : ''}} <ion-label style="cursor:pointer; font-weight: {{(currentMove.fen == item.fen) ? 'bold' : 'normal'}}" (click)="showMove(item)">{{item.move}} </ion-label>
+            {{list.length > 1 && order == 0 ? '(' : ''}} {{list.length > 1 && order > 0 ? '|' : ''}} <ion-label style="cursor:pointer; font-weight: {{(currentMove.fen == item.fen) ? 'bold' : 'normal'}}" (click)="showMove(item)">{{item.order == item.parent.order ? '' : item.order + '.'}} {{item.move}} </ion-label>
             <ng-container *ngIf="item.children.length > 0">
               <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: item.children }"></ng-container>
             </ng-container>

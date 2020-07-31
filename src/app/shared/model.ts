@@ -39,6 +39,7 @@ export interface MoveTree {
     parent: MoveTree,
     children: MoveTree[],
     level: number,
+    order: number,
     move: string,
     fen: string
 }
