@@ -332,7 +332,10 @@ export class PositionPage implements OnInit, OnDestroy {
   private async clipboardDialog(): Promise<string> {
     return new Promise<string>(async resolve => {
       const modal = await this.modalController.create({
-        component: ClipboardDialog
+        component: ClipboardDialog,
+        componentProps: {
+          'showPGN': 'true'
+        }
       });
       modal.present();
       const { data } = await modal.onDidDismiss();

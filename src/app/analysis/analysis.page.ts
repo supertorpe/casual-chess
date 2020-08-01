@@ -191,15 +191,19 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   btnRemoveClick() {
-    const parent = this.currentMove.parent;
-    parent.children.splice(parent.children.findIndex(item => item.fen == this.currentMove.fen), 1);
-    if (parent.children.length > 0) {
-      this.currentMove = parent.children[parent.children.length - 1];
+    if (this.currentMove == this.moveTree) {
+      this.moveTree.children = [];
     } else {
-      this.currentMove = parent;
+      const parent = this.currentMove.parent;
+      parent.children.splice(parent.children.findIndex(item => item.fen == this.currentMove.fen), 1);
+      if (parent.children.length > 0) {
+        this.currentMove = parent.children[parent.children.length - 1];
+      } else {
+        this.currentMove = parent;
+      }
+      this.chessboard.showFen(this.currentMove.fen);
+      this.updateInfoText();
     }
-    this.chessboard.showFen(this.currentMove.fen);
-    this.updateInfoText();
   }
 
   async onGameOver(message) {
@@ -208,6 +212,9 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   showMove(move: MoveTree) {
+    if (this.currentMove == move) {
+      return;
+    }
     this.currentMove = move;
     this.chessboard.showFen(move.fen);
     this.updateInfoText();
@@ -249,7 +256,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       const modal = await this.modalController.create({
         component: ClipboardDialog,
         componentProps: {
-          'showPGN': false
+          'showPGN': 'false'
         }
       });
       modal.present();

@@ -39,7 +39,7 @@
               </ion-button>
             </ion-col>
             <ion-col size="2">
-              <ion-button (click)="btnRemoveClick()" [disabled]="moveTree.fen == currentMove.fen" size="small" fill="clear" color="dark">
+              <ion-button (click)="btnRemoveClick()" size="small" fill="clear" color="dark">
                 <ion-icon slot="icon-only" name="cut-outline"></ion-icon>
               </ion-button>
             </ion-col>
@@ -57,7 +57,7 @@
             <ion-icon name="caret-up-outline"></ion-icon>
           </ion-fab-button>
           <ion-fab-list side="top">
-              <ion-fab-button color="dark" (click)="btnCopyClipboardClick()"><ion-icon name="clipboard"></ion-icon></ion-fab-button>
+              <ion-fab-button color="dark" (click)="btnCopyClipboardClick()"><ion-icon name="clipboard-outline"></ion-icon></ion-fab-button>
               <ion-fab-button color="dark" (click)="btnSettingsClick()"><ion-icon name="options"></ion-icon></ion-fab-button>
           </ion-fab-list>
       </ion-fab>
