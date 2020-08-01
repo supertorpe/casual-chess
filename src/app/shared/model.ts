@@ -20,6 +20,7 @@ export interface Game {
     $key?: string,
     uid: string,
     timestamp: Date,
+    lastupdated: Date,
     vid: string,
     wid: string,
     bid: string,
@@ -31,10 +32,10 @@ export interface Game {
     gameover: boolean,
     wdeleted: boolean,
     bdeleted: boolean,
-    turn? : string,
-    checkmated? : boolean
+    status? : string,
+    statusDescription?: string
 }
-// https://gist.github.com/arniebradfo/5cf89c362cc216df6fc1d9ca4d536b72
+
 export interface MoveTree {
     parent: MoveTree,
     children: MoveTree[],

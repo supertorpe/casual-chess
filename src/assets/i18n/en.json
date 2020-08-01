@@ -17,6 +17,10 @@
         "lost": "Lost",
         "won": "Won",
         "draw": "Draw",
+        "white-won": "White won",
+        "black-won": "Black won",
+        "white-resigned": "White resigned",
+        "black-resigned": "Black resigned",
         "your-turn": "Your turn",
         "not-your-turn": "Opponent's turn",
         "white-turn": "White turn",
@@ -40,11 +44,16 @@
         "to": "to",
         "checkmate": "checkmate",
         "draw": "Draw",
+        "draw-offer-rejected": "Draw offer rejected",
+        "white-won": "White won",
+        "black-won": "Black won",
         "moves": "moves",
         "your-turn": "Your turn",
         "not-your-turn": "Opponent's turn",
         "white-turn": "White turn",
         "black-turn": "Black turn",
+        "white-resigned": "White resigned",
+        "black-resigned": "Black resigned",
         "start": "Start",
         "gameover": "Game over",
         "congratulations": "Contratulations",
@@ -59,8 +68,21 @@
         "in": "in",
         "ups": "Oooops!",
         "ok": "OK",
+        "draw-rejected": "Draw offer rejected",
         "clipboard": {
             "title": "Select what to copy"
+        },
+        "flag": {
+            "title": "What do you want to do?",
+            "abandon": "Resign",
+            "offer-draw": "Offer draw"
+        },
+        "draw-dialog": {
+            "title": "Attention",
+            "subtitle": "Draw offer",
+            "message": "The opponent offers you draw, do you want to accept or reject it?",
+            "cancel": "Reject",
+            "accept": "Accept"
         }
     },
     "chessboard": {

@@ -42,7 +42,18 @@ export class HomePage implements OnInit, OnDestroy {
       'home.delete-dialog.subtitle',
       'home.delete-dialog.message',
       'home.delete-dialog.cancel',
-      'home.delete-dialog.continue'
+      'home.delete-dialog.continue',
+      'home.draw',
+      'home.won',
+      'home.lost',
+      'home.white-won',
+      'home.black-won',
+      'home.white-resigned',
+      'home.black-resigned',
+      'home.your-turn',
+      'home.not-your-turn',
+      'home.white-turn',
+      'home.black-turn'
     ]).subscribe(async res => {
       this.texts = res;
     }));
@@ -118,11 +129,64 @@ export class HomePage implements OnInit, OnDestroy {
                 ).subscribe(games => {
                   this.games = games;
                   this.games.forEach(game => {
-                    //if (!game.gameover) {
-                    chess.load_pgn(game.pgn);
-                    game.turn = chess.turn();
-                    game.checkmated = chess.in_checkmate();
-                    //}
+                    if (!game.status) {
+                      chess.load_pgn(game.pgn);
+                      if (chess.in_checkmate()) {
+                        if (chess.turn() == 'w') {
+                          game.status = 'WWI';
+                        } else {
+                          game.status = 'BWI';
+                        }
+                      } else if (chess.in_stalemate() || chess.insufficient_material() || chess.in_threefold_repetition() || chess.in_draw()) {
+                        game.status = 'DRA';
+                      } else {
+                        if (chess.turn() == 'w') {
+                          game.status = 'WTR';
+                        } else {
+                          game.status = 'BTR';
+                        }
+                      }
+                      this.afs.collection<Game>('games').doc(game.uid).update(game);
+                    }
+                    if (game.status == 'DRA') {
+                      game.statusDescription = this.texts['home.draw'];
+                    } else if (game.status == 'WRE') {
+                      game.statusDescription = this.texts['home.white-resigned'];
+                    } else if (game.status == 'BRE') {
+                      game.statusDescription = this.texts['home.black-resigned'];
+                    } else if (game.status == 'WWI') {
+                      if (game.wpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.won'];
+                      } else if (game.bpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.lost'];
+                      } else {
+                        game.statusDescription = this.texts['home.white-won'];
+                      }
+                    } else if (game.status == 'BWI') {
+                      if (game.wpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.lost'];
+                      } else if (game.bpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.won'];
+                      } else {
+                        game.statusDescription = this.texts['home.black-won'];
+                      }
+                    } else if (game.status == 'WTR' || game.status == 'WOD' || game.status == 'BRD') {
+                      if (game.wpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.your-turn'];
+                      } else if (game.bpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.not-your-turn'];
+                      } else {
+                        game.statusDescription = this.texts['home.white-turn'];
+                      }
+                    } else if (game.status == 'BTR' || game.status == 'BOD' || game.status == 'WRD') {
+                      if (game.wpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.not-your-turn'];
+                      } else if (game.bpkey == this.playerKey) {
+                        game.statusDescription = this.texts['home.your-turn'];
+                      } else {
+                        game.statusDescription = this.texts['home.black-turn'];
+                      }
+                    } 
                   });
                 }));
           };

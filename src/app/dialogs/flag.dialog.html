@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{'position.flag.title' | translate}}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="btnCloseClick()">
+                <ion-icon name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-grid>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="abandonClick()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="flag-outline"></ion-icon>
+                    <ion-label>{{'position.flag.abandon' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="offerDraw()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="hand-left-outline"></ion-icon>
+                    <ion-label>{{'position.flag.offer-draw' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>

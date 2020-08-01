@@ -9,8 +9,9 @@ import { AlertController, MenuController, ToastController, ModalController, Plat
 import { TranslateService } from '@ngx-translate/core';
 import { ChessboardComponent } from '../chessboard';
 import { ClipboardDialog } from '../dialogs/clipboard.dialog';
+import { FlagDialog } from '../dialogs/flag.dialog';
 import domtoimage from 'dom-to-image-hm';
-
+import * as Chess from 'chess.js';
 import { PreferencesPage } from '../preferences/preferences.page';
 
 import { environment } from '../../environments/environment';
@@ -69,43 +70,76 @@ export class PositionPage implements OnInit, OnDestroy {
             this.embed = (params.embed == 'true');
           })
       );
-      this.subscriptions.push(
-        this.route.params.subscribe(params => {
-          this.id = params.id;
-          this.playerType = params.id[0];
-          this.subscriptions.push(
-            this.afs.collection<Game>('games', ref => {
-              return ref.where(`${this.playerType}id`, '==', params.id)
-            })
-              .valueChanges()
-              .subscribe(data => {
-                this.loadGame(data[0]);
-                this.initLocales();
-              }));
-          if (this.playerType == 'v' && this.configuration.pid) {
+
+      this.subscriptions.push(this.translate.get([
+        'position.your-turn',
+        'position.not-your-turn',
+        'position.white-turn',
+        'position.black-turn',
+        'position.white-resigned',
+        'position.black-resigned',
+        'position.gameover',
+        'position.draw',
+        'position.draw-offer-rejected',
+        'position.congratulations',
+        'position.review',
+        'position.spectator-link-clipboard',
+        'position.fen-clipboard',
+        'position.pgn-clipboard',
+        'position.img-clipboard',
+        'position.img-bbcode-clipboard',
+        'position.img-capture',
+        'position.img-uploading',
+        'position.draw-dialog.title',
+        'position.draw-dialog.subtitle',
+        'position.draw-dialog.message',
+        'position.draw-dialog.cancel',
+        'position.draw-dialog.accept',
+        'position.draw-rejected',
+        'position.in',
+        'position.moves',
+        'position.ups',
+        'position.ok'
+      ]).subscribe(async res => {
+        this.texts = res;
+        this.subscriptions.push(
+          this.route.params.subscribe(params => {
+            this.id = params.id;
+            this.playerType = params.id[0];
             this.subscriptions.push(
-              this.afs.collection<Player>('players', ref => {
-                return ref.where('pid', '==', this.configuration.pid)
+              this.afs.collection<Game>('games', ref => {
+                return ref.where(`${this.playerType}id`, '==', params.id)
               })
-                .snapshotChanges()
-                .subscribe(players => {
-                  const playerData = players[0];
-                  const player = playerData.payload.doc.data();
-                  const playerKey = playerData.payload.doc.id;
-                  let mustUpdate = false;
-                  if (!player.hasOwnProperty('stars')) {
-                    player.stars = [params.id];
-                    mustUpdate = true;
-                  } else if (!player.stars.includes(params.id)) {
-                    player.stars.push(params.id);
-                    mustUpdate = true;
-                  }
-                  if (mustUpdate) {
-                    this.afs.collection<Player>('players').doc(playerKey).update(player);
-                  }
+                .valueChanges()
+                .subscribe(data => {
+                  this.loadGame(data[0]);
+                  this.updateInfoText();
                 }));
-          }
-        }));
+            if (this.playerType == 'v' && this.configuration.pid) {
+              this.subscriptions.push(
+                this.afs.collection<Player>('players', ref => {
+                  return ref.where('pid', '==', this.configuration.pid)
+                })
+                  .snapshotChanges()
+                  .subscribe(players => {
+                    const playerData = players[0];
+                    const player = playerData.payload.doc.data();
+                    const playerKey = playerData.payload.doc.id;
+                    let mustUpdate = false;
+                    if (!player.hasOwnProperty('stars')) {
+                      player.stars = [params.id];
+                      mustUpdate = true;
+                    } else if (!player.stars.includes(params.id)) {
+                      player.stars.push(params.id);
+                      mustUpdate = true;
+                    }
+                    if (mustUpdate) {
+                      this.afs.collection<Player>('players').doc(playerKey).update(player);
+                    }
+                  }));
+            }
+          }));
+      }));
     });
 
   }
@@ -200,16 +234,92 @@ export class PositionPage implements OnInit, OnDestroy {
           this.checkGamePlayer();
         }
       }
-      this.chessboard.build(game.pgn, this.playerType);
+      this.checkGameStatus();
+      this.chessboard.build(game.pgn, this.playerType, game.status);
       this.parsePgn(game.pgn);
     } else {
-      this.chessboard.update(game.pgn);
+      this.checkGameStatus();
+      this.chessboard.update(game.pgn, game.status);
       this.parsePgn(game.pgn);
       this.updateInfoText();
     }
+    if (this.game.status == 'WOD' && this.playerType == 'b' || this.game.status == 'BOD' && this.playerType == 'w') {
+      this.showDrawOfferDialog();
+    }
   }
-  private updateInfoText() {
-    if (this.chessboard.isGameOver()) {
+
+  async showDrawOfferDialog() {
+    const alert = await this.alertController.create({
+      header: this.texts['position.draw-dialog.title'],
+      subHeader: this.texts['position.draw-dialog.subtitle'],
+      message: this.texts['position.draw-dialog.message'],
+      buttons: [
+        {
+          text: this.texts['position.draw-dialog.cancel'],
+          role: 'cancel',
+          cssClass: 'overlay-button',
+          handler: () => {
+            if (this.playerType == 'w')
+              this.game.status = 'WRD';
+            else if (this.playerType == 'b')
+              this.game.status = 'BRD';
+            this.game.lastupdated = new Date();
+            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+          }
+        }, {
+          text: this.texts['position.draw-dialog.accept'],
+          cssClass: 'overlay-button',
+          handler: () => {
+            this.game.status = 'DRA';
+            this.game.lastupdated = new Date();
+            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  checkGameStatus() {
+    if (!this.game.status) {
+      const auxChess: Chess = new Chess();
+      auxChess.load_pgn(this.game.pgn);
+      if (auxChess.in_checkmate()) {
+        if (auxChess.turn() == 'w') {
+          this.game.status = 'WWI';
+        } else {
+          this.game.status = 'BWI';
+        }
+      } else if (auxChess.in_stalemate() || auxChess.insufficient_material() || auxChess.in_threefold_repetition() || auxChess.in_draw()) {
+        this.game.status = 'DRA';
+      } else {
+        if (auxChess.turn() == 'w') {
+          this.game.status = 'WTR';
+        } else {
+          this.game.status = 'BTR';
+        }
+      }
+      this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+    }
+  }
+
+  async updateInfoText() {
+    if (this.game.status == 'WRD' && this.playerType == 'b' || this.game.status == 'BRD' && this.playerType == 'w') {
+      const toast = await this.toast.create({
+        message: this.texts['position.draw-offer-rejected'],
+        position: 'middle',
+        color: 'warning',
+        duration: 3000
+      });
+      toast.present();
+    }
+    if (this.game.status == 'DRA') {
+      this.infotext = this.texts['position.draw'];
+    } else if (this.game.status == 'WRE') {
+      this.infotext = this.texts['position.white-resigned'];
+    } else if (this.game.status == 'BRE') {
+      this.infotext = this.texts['position.black-resigned'];
+    } else if (this.chessboard.isGameOver()) {
       if (this.chessboard.isCheckmated()) {
         this.infotext = this.texts['position.gameover'];
       } else {
@@ -254,33 +364,6 @@ export class PositionPage implements OnInit, OnDestroy {
     }
   }
 
-  private initLocales() {
-    this.subscriptions.push(this.translate.get([
-      'position.your-turn',
-      'position.not-your-turn',
-      'position.white-turn',
-      'position.black-turn',
-      'position.gameover',
-      'position.draw',
-      'position.congratulations',
-      'position.review',
-      'position.spectator-link-clipboard',
-      'position.fen-clipboard',
-      'position.pgn-clipboard',
-      'position.img-clipboard',
-      'position.img-bbcode-clipboard',
-      'position.img-capture',
-      'position.img-uploading',
-      'position.in',
-      'position.moves',
-      'position.ups',
-      'position.ok'
-    ]).subscribe(async res => {
-      this.texts = res;
-      this.updateInfoText();
-    }));
-  }
-
   async onWarn(info) {
     const toast = await this.toast.create({
       message: info,
@@ -294,12 +377,27 @@ export class PositionPage implements OnInit, OnDestroy {
   onPlayerMoved() {
     this.game.pgn = this.chessboard.pgn();
     this.parsePgn(this.game.pgn);
+    this.game.lastupdated = new Date();
+    if (this.chessboard.turn() == 'w') {
+      this.game.status = 'WTR';
+    } else {
+      this.game.status = 'BTR';
+    }
     this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
   }
 
-  async onGameOver(message) {
-    this.infotext = message;
+  async onGameOver(values: string[]) {
+    const message = values[0];
+    const status = values[1];
+    const toast = await this.toast.create({
+      message: message,
+      position: 'middle',
+      color: 'warning',
+      duration: 5000
+    });
+    toast.present();
     this.game.gameover = true;
+    this.game.status = status;
     this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
   }
 
@@ -402,6 +500,47 @@ export class PositionPage implements OnInit, OnDestroy {
               img.src = dataUrl;
             }
           });
+        }
+      }
+    });
+  }
+
+  private async flagDialog(): Promise<string> {
+    return new Promise<string>(async resolve => {
+      const modal = await this.modalController.create({
+        component: FlagDialog,
+      });
+      modal.present();
+      const { data } = await modal.onDidDismiss();
+      if (data == undefined) {
+        resolve(null);
+      } else {
+        resolve(data);
+      }
+    });
+  }
+
+  btnFlagClick() {
+    this.flagDialog().then(async what => {
+      if (what) {
+        if ('abandon' == what) {
+          this.chessboard.cleanPlayer();
+          if (this.playerType == 'w') {
+            this.game.status = 'WRE';
+          } else if (this.playerType == 'b') {
+            this.game.status = 'BRE';
+          }
+          this.game.lastupdated = new Date();
+          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+          this.updateInfoText();
+        } else if ('offer-draw' == what) {
+          if (this.playerType == 'w') {
+            this.game.status = 'WOD';
+          } else if (this.playerType == 'b') {
+            this.game.status = 'BOD';
+          }
+          this.game.lastupdated = new Date();
+          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
         }
       }
     });

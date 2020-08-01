@@ -17,6 +17,10 @@
         "lost": "Perdida",
         "won": "Ganada",
         "draw": "Tablas",
+        "white-won": "Blancas ganaron",
+        "black-won": "Negras ganaron",
+        "white-resigned": "Blancas abandonaron",
+        "black-resigned": "Negras abandonaron",
         "your-turn": "Tu turno",
         "not-your-turn": "Esperando al oponente",
         "white-turn": "Turno de blancas",
@@ -40,11 +44,14 @@
         "to": "buscan",
         "checkmate": "mate",
         "draw": "Tablas",
+        "draw-offer-rejected": "Oferta de tablas rechazada",
         "moves": "movimientos",
         "your-turn": "Tu turno",
         "not-your-turn": "Turno del adversario",
         "white-turn": "Turno de blancas",
         "black-turn": "Turno de negras",
+        "white-resigned": "Blancas abandonaron",
+        "black-resigned": "Negras abandonaron",
         "start": "Inicio",
         "gameover": "Partida finalizada",
         "congratulations": "Enhorabuena",
@@ -59,8 +66,21 @@
         "in": "en",
         "ups": "¡Ohhh!",
         "ok": "Aceptar",
+        "draw-rejected": "Oferta de tablas rechazada",
         "clipboard": {
             "title": "¿Qué quieres copiar?"
+        },
+        "flag": {
+            "title": "¿Qué deseas hacer?",
+            "abandon": "Abandonar",
+            "offer-draw": "Ofrecer tablas"
+        },
+        "draw-dialog": {
+            "title": "Atención",
+            "subtitle": "Oferta de tablas",
+            "message": "El oponente le ofrece tablas, ¿desea aceptarlas o rechazarlas?",
+            "cancel": "Rechazar",
+            "accept": "Aceptar"
         }
     },
     "chessboard": {
