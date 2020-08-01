@@ -59,7 +59,7 @@
         "ups": "Oooops!",
         "ok": "OK",
         "clipboard": {
-            "title": "Select what you want to copy to the clipboard"
+            "title": "Select what to copy"
         }
     },
     "chessboard": {

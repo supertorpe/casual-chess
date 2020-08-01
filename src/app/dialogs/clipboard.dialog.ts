@@ -26,5 +26,9 @@ export class ClipboardDialog {
   saveImg() {
     this.modalController.dismiss('img');
   }
+
+  btnCloseClick() {
+    this.modalController.dismiss(null);
+  }
   
 }
