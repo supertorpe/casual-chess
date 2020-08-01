@@ -17,26 +17,14 @@
       </chessboard>
     </div>
     <div class="info_wrapper" *ngIf="game">
-      <div class="info" *ngIf="this.autoplaying || (!this.game.gameover && 'v' != this.playerType)">
+      <div class="info">
         <ng-container *ngFor="let moves of parsedPgn; trackBy: trackFunc; let idx = index;">
-          {{idx+1}}.<ng-container *ngFor="let move of moves; trackBy: trackFunc; let idx2 = index"><ion-label style="font-weight: {{(idx*2 + idx2 == chessboard.currentPosition()) ? 'bold' : 'normal'}}" [color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'dark' : 'medium'">&nbsp;{{move}}</ion-label></ng-container>
-          </ng-container>
-      </div>
-      <div class="info" *ngIf="!this.autoplaying && (this.game.gameover || 'v' == this.playerType)">
-        <ng-container *ngFor="let moves of parsedPgn; trackBy: trackFunc; let idx = index;">
-        {{idx+1}}.<ng-container *ngFor="let move of moves; trackBy: trackFunc; let idx2 = index"><ion-label style="cursor:pointer; font-weight: {{(idx*2 + idx2 == chessboard.currentPosition()) ? 'bold' : 'normal'}}" [color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'dark' : 'medium'" (click)="chessboard.showPosition(idx*2 + idx2)">&nbsp;{{move}}</ion-label></ng-container>
+        {{idx+1}}.<ng-container *ngFor="let move of moves; trackBy: trackFunc; let idx2 = index"><ion-label style="cursor:pointer; font-weight: {{(idx*2 + idx2 == chessboard.currentPosition()) ? 'bold' : 'normal'}}" [color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'dark' : 'medium'" (click)="this.autoplaying ? true : chessboard.showPosition(idx*2 + idx2)">&nbsp;{{move}}</ion-label></ng-container>
         </ng-container>
       </div>
       <div class="action_buttons" *ngIf="game">
         <ion-grid>
-          <ion-row *ngIf="!game.gameover && 'v' != playerType">
-            <ion-col size="2">
-              <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
-                <ion-icon slot="icon-only" name="sync"></ion-icon>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-          <ion-row *ngIf="game.gameover || 'v' == playerType">
+          <ion-row>
             <ion-col size="2">
               <ion-button (click)="btnFlipClick()" size="small" fill="clear" color="dark">
                 <ion-icon slot="icon-only" name="sync"></ion-icon>

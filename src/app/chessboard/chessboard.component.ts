@@ -278,7 +278,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     private onDragStart(source, piece, position, orientation) {
         const re = this.player == 'w' ? /^b/ : /^w/;
-        if (this.chess.game_over() || piece.search(re) !== -1 || this.chess.turn() !== this.player) {
+        if (this.chess.game_over() || piece.search(re) !== -1 || this.chess.turn() !== this.player || this.pointer != this.chessHistory.length - 1) {
             return false;
         }
         this.drawGreySquares(source);
@@ -368,7 +368,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     };
 
     private onMouseoverSquare(square, piece, position, orientation) {
-        if (this.chess.turn() !== this.player) {
+        if (this.chess.turn() !== this.player || this.pointer != this.chessHistory.length - 1) {
             return;
         }
         if (this.isMobileBrowser && this.squareSelected) {
