@@ -10,10 +10,14 @@ import { TranslateService } from '@ngx-translate/core';
 export class ClipboardDialog {
 
   @Input() showPGN: string;
+  @Input() showSpectatorLink: string;
 
   constructor(public modalController: ModalController, public translate: TranslateService) {
   }
 
+  copySpectatorlink() {
+    this.modalController.dismiss('spectator-link');
+  }
   copyFen() {
     this.modalController.dismiss('fen');
   }

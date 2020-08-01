@@ -10,6 +10,14 @@
 </ion-header>
 <ion-content>
     <ion-grid>
+        <ion-row *ngIf="showSpectatorLink=='true'">
+            <ion-col>
+                <ion-button (click)="copySpectatorlink()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="clipboard-outline"></ion-icon>
+                    <ion-label>{{'home.link-viewer' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
         <ion-row>
             <ion-col>
                 <ion-button (click)="copyFen()" color="light" size="large" expand="full">

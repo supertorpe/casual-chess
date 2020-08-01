@@ -49,6 +49,7 @@
         "gameover": "Partida finalizada",
         "congratulations": "Enhorabuena",
         "review": "revisar",
+        "spectator-link-clipboard": "Enlace copiado al portapapeles",
         "fen-clipboard": "FEN copiado al portapapeles",
         "pgn-clipboard": "PGN copiado al portapapeles",
         "img-clipboard": "Imagen descargada",

@@ -256,7 +256,8 @@ export class AnalysisPage implements OnInit, OnDestroy {
       const modal = await this.modalController.create({
         component: ClipboardDialog,
         componentProps: {
-          'showPGN': 'false'
+          'showPGN': 'false',
+          'showSpectatorLink': 'false'
         }
       });
       modal.present();

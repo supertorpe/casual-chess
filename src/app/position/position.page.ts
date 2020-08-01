@@ -264,6 +264,7 @@ export class PositionPage implements OnInit, OnDestroy {
       'position.draw',
       'position.congratulations',
       'position.review',
+      'position.spectator-link-clipboard',
       'position.fen-clipboard',
       'position.pgn-clipboard',
       'position.img-clipboard',
@@ -334,7 +335,8 @@ export class PositionPage implements OnInit, OnDestroy {
       const modal = await this.modalController.create({
         component: ClipboardDialog,
         componentProps: {
-          'showPGN': 'true'
+          'showPGN': 'true',
+          'showSpectatorLink': 'true'
         }
       });
       modal.present();
@@ -350,7 +352,9 @@ export class PositionPage implements OnInit, OnDestroy {
   btnCopyClipboardClick() {
     this.clipboardDialog().then(async what => {
       if (what) {
-        if ('fen' == what) {
+        if ('spectator-link' == what) {
+          this.copyToClipboard(what, `https://casual-chess.web.app/position/${this.game.vid}`);
+        } if ('fen' == what) {
           this.copyToClipboard(what, this.chessboard.fen());
         } else if ('pgn' == what) {
           this.copyToClipboard(what, this.chessboard.pgn());
@@ -434,7 +438,6 @@ export class PositionPage implements OnInit, OnDestroy {
       document.execCommand('copy');
       document.body.removeChild(el);
     }
-
     this.showToastClipboard(what);
   }
 

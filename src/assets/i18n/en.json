@@ -49,6 +49,7 @@
         "gameover": "Game over",
         "congratulations": "Contratulations",
         "review": "review",
+        "spectator-link-clipboard": "Link copied to clipboard",
         "fen-clipboard": "FEN copied to the clipboard",
         "pgn-clipboard": "PGN copied to the clipboard",
         "img-clipboard": "Image downloaded",
