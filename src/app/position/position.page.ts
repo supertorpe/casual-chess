@@ -511,6 +511,7 @@ export class PositionPage implements OnInit, OnDestroy {
     return new Promise<string>(async resolve => {
       const modal = await this.modalController.create({
         component: FlagDialog,
+        componentProps: { showOfferDraw: (this.chessboard.turn() == this.playerType ? 'true' : 'false') }
       });
       modal.present();
       const { data } = await modal.onDidDismiss();

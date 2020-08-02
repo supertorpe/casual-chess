@@ -9,6 +9,8 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class FlagDialog {
 
+  @Input() showOfferDraw: string;
+
   constructor(public modalController: ModalController, public translate: TranslateService) {
   }
 

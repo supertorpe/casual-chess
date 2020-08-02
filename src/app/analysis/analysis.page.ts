@@ -28,7 +28,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
   public embed = false;
   public returnUrl: string;
   private game: Game;
-  private pid : string;
+  private pid: string;
   public analysis: Analysis;
   public moveTree: MoveTree;
   public currentMove: MoveTree;
@@ -57,58 +57,87 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.configurationService.initialize().then(config => {
-      this.configuration = config;
-      this.subscriptions.push(
-        this.route.queryParams
-          .subscribe(params => {
-            this.embed = (params.embed == 'true');
-            this.returnUrl = params.returnUrl;
-            if (this.returnUrl && this.returnUrl.startsWith('/position/')) {
-              const id = this.returnUrl.substring(10);
-              this.subscriptions.push(
-                this.afs.collection<Game>('games', ref => {
-                  return ref.where(`${id[0]}id`, '==', id)
-                })
-                  .valueChanges()
-                  .subscribe(data => {
-                    this.game = data[0];
-                  }));
-            }
-          })
-      );
-      if (this.configuration && this.configuration.pid) {
-        this.subscriptions.push(this.afs.collection<Player>('players', ref => {
-          return ref.where('pid', '==', this.configuration.pid)
-        })
-          .valueChanges()
-          .subscribe(players => {
-            if (players != null && players.length > 0) {
-              this.pid = players[0].pid;
-            }
-          })
+    this.subscriptions.push(this.translate.get([
+      'position.your-turn',
+      'position.not-your-turn',
+      'position.white-turn',
+      'position.black-turn',
+      'position.gameover',
+      'position.draw',
+      'position.congratulations',
+      'position.review',
+      'position.analysis-clipboard',
+      'position.fen-clipboard',
+      'position.pgn-clipboard',
+      'position.img-clipboard',
+      'position.img-bbcode-clipboard',
+      'position.img-capture',
+      'position.img-uploading',
+      'position.in',
+      'position.moves',
+      'position.ups',
+      'position.ok',
+      'analysis.saved',
+      'analysis.save-before-copy'
+    ]).subscribe(async res => {
+      this.texts = res;
+
+
+
+
+      this.configurationService.initialize().then(config => {
+        this.configuration = config;
+        this.subscriptions.push(
+          this.route.queryParams
+            .subscribe(params => {
+              this.embed = (params.embed == 'true');
+              this.returnUrl = params.returnUrl;
+              if (this.returnUrl && this.returnUrl.startsWith('/position/')) {
+                const id = this.returnUrl.substring(10);
+                this.subscriptions.push(
+                  this.afs.collection<Game>('games', ref => {
+                    return ref.where(`${id[0]}id`, '==', id)
+                  })
+                    .valueChanges()
+                    .subscribe(data => {
+                      this.game = data[0];
+                    }));
+              }
+            })
         );
-      }
-      this.subscriptions.push(
-        this.route.params
-          .subscribe(params => {
-            if (params.fen1) {
-              this.loadFen(`${params.fen1}/${params.fen2}/${params.fen3}/${params.fen4}/${params.fen5}/${params.fen6}/${params.fen7}/${params.fen8}`);
-            } else if (params.uid) {
-              this.subscriptions.push(
-                this.afs.collection<Analysis>('analysis', ref => {
-                  return ref.where('uid', '==', params.uid)
-                })
-                  .valueChanges()
-                  .subscribe(data => {
-                    if (data != null && data.length > 0) {
-                      this.loadAnalysis(data[0]);
-                    }
-                  }));
-            }
+        if (this.configuration && this.configuration.pid) {
+          this.subscriptions.push(this.afs.collection<Player>('players', ref => {
+            return ref.where('pid', '==', this.configuration.pid)
           })
-      );
-    });
+            .valueChanges()
+            .subscribe(players => {
+              if (players != null && players.length > 0) {
+                this.pid = players[0].pid;
+              }
+            })
+          );
+        }
+        this.subscriptions.push(
+          this.route.params
+            .subscribe(params => {
+              if (params.fen1) {
+                this.loadFen(`${params.fen1}/${params.fen2}/${params.fen3}/${params.fen4}/${params.fen5}/${params.fen6}/${params.fen7}/${params.fen8}`);
+              } else if (params.uid) {
+                this.subscriptions.push(
+                  this.afs.collection<Analysis>('analysis', ref => {
+                    return ref.where('uid', '==', params.uid)
+                  })
+                    .valueChanges()
+                    .subscribe(data => {
+                      if (data != null && data.length > 0) {
+                        this.loadAnalysis(data[0]);
+                      }
+                    }));
+              }
+            })
+        );
+      });
+    }));
   }
 
   ngOnDestroy() {
@@ -122,7 +151,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
     const parts = fen.split(' ');
     this.startingPos = +parts[parts.length - 1];
     this.chessboard.build(fen);
-    this.initLocales();
+    this.updateInfoText();
     this.moveTree = {
       parent: null,
       children: [],
@@ -135,11 +164,11 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   loadAnalysis(analysis: Analysis) {
-    this.analysis =analysis;
+    this.analysis = analysis;
     this.fen = analysis.fen;
     this.startingPos = analysis.frompos;
     this.chessboard.build(analysis.fen);
-    this.initLocales();
+    this.updateInfoText();
     this.moveTree = JSON.parse(analysis.movetree);
     this.moveTree.fen = analysis.fen;
     this.moveTree.parent = null;
@@ -197,35 +226,6 @@ export class AnalysisPage implements OnInit, OnDestroy {
     }
   }
 
-  private initLocales() {
-    this.subscriptions.push(this.translate.get([
-      'position.your-turn',
-      'position.not-your-turn',
-      'position.white-turn',
-      'position.black-turn',
-      'position.gameover',
-      'position.draw',
-      'position.congratulations',
-      'position.review',
-      'position.analysis-clipboard',
-      'position.fen-clipboard',
-      'position.pgn-clipboard',
-      'position.img-clipboard',
-      'position.img-bbcode-clipboard',
-      'position.img-capture',
-      'position.img-uploading',
-      'position.in',
-      'position.moves',
-      'position.ups',
-      'position.ok',
-      'analysis.saved',
-      'analysis.save-before-copy'
-    ]).subscribe(async res => {
-      this.texts = res;
-      this.updateInfoText();
-    }));
-  }
-
   async onWarn(info) {
     const toast = await this.toast.create({
       message: info,
@@ -238,7 +238,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
 
   onPlayerMoved(movement) {
     // If the move already exists in the list, just change the pointer
-    const aux = this.currentMove.children.find(item => {return item.move == movement});
+    const aux = this.currentMove.children.find(item => { return item.move == movement });
     if (aux) {
       this.currentMove = aux;
     } else {
@@ -277,7 +277,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       if (this.currentMove.quality == null)
         this.currentMove.quality = '+';
       else if (this.currentMove.quality == '-')
-      this.currentMove.quality = null;
+        this.currentMove.quality = null;
     }
   }
 
@@ -286,7 +286,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       if (this.currentMove.quality == null)
         this.currentMove.quality = '-';
       else if (this.currentMove.quality == '+')
-      this.currentMove.quality = null;
+        this.currentMove.quality = null;
     }
   }
 
@@ -297,7 +297,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       else
         return value;
     });
-    const mustCreate : boolean = (this.analysis == null);
+    const mustCreate: boolean = (this.analysis == null);
     if (mustCreate) {
       this.analysis = {
         uid: null,
