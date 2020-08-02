@@ -262,11 +262,11 @@ export class PositionPage implements OnInit, OnDestroy {
 
   private loadGame(game: Game) {
     this.game = game;
-    if ((this.playerType == 'w' && !this.game.wpname) || (this.playerType == 'b' && !this.game.bpname)) {
-      this.queryGameName();
-    }
     if (!this.gameLoaded) {
       this.gameLoaded = true;
+      if ((this.playerType == 'w' && !this.game.wpname) || (this.playerType == 'b' && !this.game.bpname)) {
+        this.queryGameName();
+      }
       // set player pid and name
       if (this.playerType !== 'v') {
         if (this.configuration.pid == null) {
