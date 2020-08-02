@@ -30,6 +30,7 @@
         "link-black-player": "Link for the player with the black pieces",
         "link-viewer": "Link for viewers",
         "link-copied": "Link copied to clipboard",
+        "analysis-link": "Link to analysis",
         "delete-dialog" : {
             "title": "Are you sure?",
             "subtitle": "Remove game",
@@ -59,6 +60,7 @@
         "congratulations": "Contratulations",
         "review": "review",
         "spectator-link-clipboard": "Link copied to clipboard",
+        "analysis-clipboard": "Link copied to clipboard",
         "fen-clipboard": "FEN copied to the clipboard",
         "pgn-clipboard": "PGN copied to the clipboard",
         "img-clipboard": "Image downloaded",
@@ -83,7 +85,16 @@
             "message": "The opponent offers you draw, do you want to accept or reject it?",
             "cancel": "Reject",
             "accept": "Accept"
+        },
+        "analysis-dialog": {
+            "title": "Select or create a new one",
+            "frompos": "From position",
+            "create": "New analysis"
         }
+    },
+    "analysis": {
+        "saved": "Analysis saved",
+        "save-before-copy": "Save analysis before sharing"
     },
     "chessboard": {
         "stalemate": "Stalemate",

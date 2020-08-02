@@ -18,6 +18,14 @@
                 </ion-button>
             </ion-col>
         </ion-row>
+        <ion-row *ngIf="showAnalysisLink=='true'">
+            <ion-col>
+                <ion-button (click)="copyAnalysislink()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="flask-outline"></ion-icon>
+                    <ion-label>{{'home.analysis-link' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
         <ion-row>
             <ion-col>
                 <ion-button (click)="copyFen()" color="light" size="large" expand="full">

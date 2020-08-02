@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { ConfigurationService, Configuration, Game, UtilsService, Player } from '../shared';
+import { ConfigurationService, Configuration, Game, UtilsService, Player, Analysis } from '../shared';
 import { Subscription } from 'rxjs';
 import { AlertController, MenuController, ToastController, ModalController, Platform, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,8 @@ import * as Chess from 'chess.js';
 import { PreferencesPage } from '../preferences/preferences.page';
 
 import { environment } from '../../environments/environment';
+import { subscribeOn } from 'rxjs/operators';
+import { AnalysisDialog } from '../dialogs/analysis.dialog';
 
 @Component({
   selector: 'app-position',
@@ -642,8 +644,45 @@ export class PositionPage implements OnInit, OnDestroy {
     }
   }
 
+  private async analysisDialog(list: Analysis[]): Promise<string> {
+    return new Promise<string>(async resolve => {
+      const modal = await this.modalController.create({
+        component: AnalysisDialog,
+        componentProps: {
+          'list': list
+        }
+      });
+      modal.present();
+      const { data } = await modal.onDidDismiss();
+      if (data == undefined) {
+        resolve(null);
+      } else {
+        resolve(data);
+      }
+    });
+  }
+
   btnAnalysisClick() {
-    this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?embed=' + this.embed + '&returnUrl=/position/' + this.id);
+    this.subscriptions.push(
+      this.afs.collection<Analysis>('analysis', ref => {
+        return ref
+          .where('pid', '==', this.configuration.pid)
+          .where('gid', '==', this.game.uid)
+      })
+        .valueChanges()
+        .subscribe(list => {
+          if (list == null || list.length == 0) {
+            this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?embed=' + this.embed + '&returnUrl=/position/' + this.id);
+          } else {
+            this.analysisDialog(list).then(async what => {
+              if ('create' == what) {
+                this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?embed=' + this.embed + '&returnUrl=/position/' + this.id);
+              } else if (what) {
+                this.navCtrl.navigateRoot('/analysis/' + what + '?embed=' + this.embed + '&returnUrl=/position/' + this.id);
+              }
+            });
+          }
+        }));
   }
 
   parsePgn(pgn: string) {

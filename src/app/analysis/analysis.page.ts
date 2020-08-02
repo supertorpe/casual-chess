@@ -3,14 +3,14 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { ConfigurationService, Configuration, UtilsService, MoveTree } from '../shared';
+import { ConfigurationService, Configuration, UtilsService, MoveTree, Game, Analysis, Player } from '../shared';
 import { Subscription } from 'rxjs';
 import { AlertController, MenuController, ToastController, ModalController, Platform, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { AnalysisChessboardComponent } from '../chessboard';
 import { ClipboardDialog } from '../dialogs/clipboard.dialog';
 import domtoimage from 'dom-to-image-hm';
-
+import * as Chess from 'chess.js';
 import { PreferencesPage } from '../preferences/preferences.page';
 
 import { environment } from '../../environments/environment';
@@ -24,12 +24,16 @@ export class AnalysisPage implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  private configuration: Configuration;
+  public configuration: Configuration;
   public embed = false;
   public returnUrl: string;
+  private game: Game;
+  private pid : string;
+  public analysis: Analysis;
   public moveTree: MoveTree;
   public currentMove: MoveTree;
   public fen: string;
+  public startingPos: number;
   public infotext = '';
   public btnFlipEnabled = false;
   public gameOverMessage: string;
@@ -60,12 +64,48 @@ export class AnalysisPage implements OnInit, OnDestroy {
           .subscribe(params => {
             this.embed = (params.embed == 'true');
             this.returnUrl = params.returnUrl;
+            if (this.returnUrl && this.returnUrl.startsWith('/position/')) {
+              const id = this.returnUrl.substring(10);
+              this.subscriptions.push(
+                this.afs.collection<Game>('games', ref => {
+                  return ref.where(`${id[0]}id`, '==', id)
+                })
+                  .valueChanges()
+                  .subscribe(data => {
+                    this.game = data[0];
+                  }));
+            }
           })
       );
+      if (this.configuration && this.configuration.pid) {
+        this.subscriptions.push(this.afs.collection<Player>('players', ref => {
+          return ref.where('pid', '==', this.configuration.pid)
+        })
+          .valueChanges()
+          .subscribe(players => {
+            if (players != null && players.length > 0) {
+              this.pid = players[0].pid;
+            }
+          })
+        );
+      }
       this.subscriptions.push(
         this.route.params
           .subscribe(params => {
-            this.loadFen(`${params.fen1}/${params.fen2}/${params.fen3}/${params.fen4}/${params.fen5}/${params.fen6}/${params.fen7}/${params.fen8}`);
+            if (params.fen1) {
+              this.loadFen(`${params.fen1}/${params.fen2}/${params.fen3}/${params.fen4}/${params.fen5}/${params.fen6}/${params.fen7}/${params.fen8}`);
+            } else if (params.uid) {
+              this.subscriptions.push(
+                this.afs.collection<Analysis>('analysis', ref => {
+                  return ref.where('uid', '==', params.uid)
+                })
+                  .valueChanges()
+                  .subscribe(data => {
+                    if (data != null && data.length > 0) {
+                      this.loadAnalysis(data[0]);
+                    }
+                  }));
+            }
           })
       );
     });
@@ -77,21 +117,43 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   loadFen(fen: string) {
+    this.analysis = null;
     this.fen = fen;
     const parts = fen.split(' ');
-    const num : number = +parts[parts.length - 1];
+    this.startingPos = +parts[parts.length - 1];
     this.chessboard.build(fen);
     this.initLocales();
     this.moveTree = {
       parent: null,
       children: [],
-      level: 0,
-      order: num - 1,
+      order: this.startingPos - 1,
       move: '[0]',
       fen: fen,
       quality: null
     };
     this.currentMove = this.moveTree;
+  }
+
+  loadAnalysis(analysis: Analysis) {
+    this.analysis =analysis;
+    this.fen = analysis.fen;
+    this.startingPos = analysis.frompos;
+    this.chessboard.build(analysis.fen);
+    this.initLocales();
+    this.moveTree = JSON.parse(analysis.movetree);
+    this.moveTree.fen = analysis.fen;
+    this.moveTree.parent = null;
+    const auxChess: Chess = new Chess();
+    this.moveTree.children.forEach(node => this.populateMoveTree(this.moveTree, node, auxChess));
+    this.currentMove = this.moveTree;
+  }
+
+  populateMoveTree(parent: MoveTree, node: MoveTree, auxChess: Chess) {
+    node.parent = parent;
+    auxChess.load(parent.fen);
+    auxChess.move(node.move);
+    node.fen = auxChess.fen();
+    node.children.forEach(subnode => this.populateMoveTree(node, subnode, auxChess));
   }
 
   private updateInfoText() {
@@ -145,6 +207,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       'position.draw',
       'position.congratulations',
       'position.review',
+      'position.analysis-clipboard',
       'position.fen-clipboard',
       'position.pgn-clipboard',
       'position.img-clipboard',
@@ -154,7 +217,9 @@ export class AnalysisPage implements OnInit, OnDestroy {
       'position.in',
       'position.moves',
       'position.ups',
-      'position.ok'
+      'position.ok',
+      'analysis.saved',
+      'analysis.save-before-copy'
     ]).subscribe(async res => {
       this.texts = res;
       this.updateInfoText();
@@ -180,7 +245,6 @@ export class AnalysisPage implements OnInit, OnDestroy {
       const move: MoveTree = {
         parent: this.currentMove,
         children: [],
-        level: this.currentMove.level + 1,
         move: movement,
         order: this.currentMove.order + (this.chessboard.turn() == 'b' ? 1 : 0),
         fen: this.chessboard.fen(),
@@ -223,6 +287,54 @@ export class AnalysisPage implements OnInit, OnDestroy {
         this.currentMove.quality = '-';
       else if (this.currentMove.quality == '+')
       this.currentMove.quality = null;
+    }
+  }
+
+  btnSaveClick() {
+    const compactTree = JSON.stringify(this.moveTree, (key, value) => {
+      if (key == 'parent' || key == 'fen')
+        return undefined;
+      else
+        return value;
+    });
+    const mustCreate : boolean = (this.analysis == null);
+    if (mustCreate) {
+      this.analysis = {
+        uid: null,
+        timestamp: new Date(),
+        pid: this.pid,
+        gid: this.game.uid,
+        fen: this.fen,
+        frompos: this.startingPos,
+        movetree: compactTree
+      };
+    } else {
+      this.analysis.movetree = compactTree;
+    }
+    // create or update analysis in firebase
+    if (mustCreate) {
+      this.afs.collection<Analysis>('analysis').add(this.analysis).then(result => {
+        this.analysis.uid = result.id;
+        this.afs.collection<Analysis>('analysis').doc(result.id).update(this.analysis).then(async () => {
+          const toast = await this.toast.create({
+            message: this.texts['analysis.saved'],
+            position: 'middle',
+            color: 'success',
+            duration: 3000
+          });
+          toast.present();
+        });
+      });
+    } else {
+      this.afs.collection<Analysis>('analysis').doc(this.analysis.uid).update(this.analysis).then(async () => {
+        const toast = await this.toast.create({
+          message: this.texts['analysis.saved'],
+          position: 'middle',
+          color: 'success',
+          duration: 3000
+        });
+        toast.present();
+      });
     }
   }
 
@@ -276,6 +388,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
       const modal = await this.modalController.create({
         component: ClipboardDialog,
         componentProps: {
+          'showAnalysisLink': 'true',
           'showPGN': 'false',
           'showSpectatorLink': 'false'
         }
@@ -293,7 +406,19 @@ export class AnalysisPage implements OnInit, OnDestroy {
   btnCopyClipboardClick() {
     this.clipboardDialog().then(async what => {
       if (what) {
-        if ('fen' == what) {
+        if ('analysis' == what) {
+          if (this.analysis == null) {
+            const toast = await this.toast.create({
+              message: this.texts['analysis.save-before-copy'],
+              position: 'middle',
+              color: 'warning',
+              duration: 3000
+            });
+            toast.present();
+          } else {
+            this.copyToClipboard(what, `https://casual-chess.web.app/analysis/${this.analysis.uid}`);
+          }
+        } else if ('fen' == what) {
           this.copyToClipboard(what, this.chessboard.fen());
         } else if ('img' == what || 'img-bbcode' == what) {
           const toast1 = await this.toast.create({

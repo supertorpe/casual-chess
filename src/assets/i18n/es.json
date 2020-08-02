@@ -30,6 +30,7 @@
         "link-black-player": "Enlace para jugador de negras",
         "link-viewer": "Enlace para espectadores",
         "link-copied": "Enlace copiado al portapapeles",
+        "analysis-link": "Enlace al análisis",
         "delete-dialog" : {
             "title": "¿Está seguro?",
             "subtitle": "Eliminar partida",
@@ -57,6 +58,7 @@
         "congratulations": "Enhorabuena",
         "review": "revisar",
         "spectator-link-clipboard": "Enlace copiado al portapapeles",
+        "analysis-clipboard": "Link copiado al portapapeles",
         "fen-clipboard": "FEN copiado al portapapeles",
         "pgn-clipboard": "PGN copiado al portapapeles",
         "img-clipboard": "Imagen descargada",
@@ -81,7 +83,16 @@
             "message": "El oponente le ofrece tablas, ¿desea aceptarlas o rechazarlas?",
             "cancel": "Rechazar",
             "accept": "Aceptar"
+        },
+        "analysis-dialog": {
+            "title": "Seleccione o cree uno nuevo",
+            "frompos": "Desde posición",
+            "create": "Nuevo análisis"
         }
+    },
+    "analysis": {
+        "saved": "Análisis guardado",
+        "save-before-copy": "Guarda el análisis para poder compartirlo"
     },
     "chessboard": {
         "stalemate": "Ahogado",

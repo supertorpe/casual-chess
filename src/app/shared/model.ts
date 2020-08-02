@@ -39,9 +39,18 @@ export interface Game {
 export interface MoveTree {
     parent: MoveTree,
     children: MoveTree[],
-    level: number,
     order: number,
     move: string,
     fen: string,
     quality: string
+}
+
+export interface Analysis {
+    uid: string,
+    pid: string,
+    fen: string,
+    timestamp: Date,
+    gid: string,
+    frompos: number,
+    movetree: string
 }

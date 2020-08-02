@@ -26,6 +26,10 @@ const routes: Routes = [
   {
     path: 'analysis/:fen1/:fen2/:fen3/:fen4/:fen5/:fen6/:fen7/:fen8',
     loadChildren: () => import('./analysis/analysis.module').then( m => m.AnalisysPageModule)
+  },
+  {
+    path: 'analysis/:uid',
+    loadChildren: () => import('./analysis/analysis.module').then( m => m.AnalisysPageModule)
   }
 ];
 

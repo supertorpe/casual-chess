@@ -11,6 +11,7 @@ export class ClipboardDialog {
 
   @Input() showPGN: string;
   @Input() showSpectatorLink: string;
+  @Input() showAnalysisLink: string;
 
   constructor(public modalController: ModalController, public translate: TranslateService) {
   }
@@ -29,6 +30,9 @@ export class ClipboardDialog {
   }
   saveImg() {
     this.modalController.dismiss('img');
+  }
+  copyAnalysislink() {
+    this.modalController.dismiss('analysis');
   }
 
   btnCloseClick() {

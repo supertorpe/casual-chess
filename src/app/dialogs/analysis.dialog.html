@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{'position.analysis-dialog.title' | translate}}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="btnCloseClick()">
+                <ion-icon name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-grid>
+        <ion-row *ngFor="let item of list; trackBy: trackFunc">
+            <ion-col>
+                <ion-button (click)="showClick(item.uid)" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                    <ion-label class="responsive-text">{{item.timestamp.toDate() | date: 'dd/MM/yyyy hh:mm:ss'}} {{'position.analysis-dialog.frompos' | translate}} {{item.frompos}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-button (click)="create()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                    <ion-label class="responsive-text">{{'position.analysis-dialog.create' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>
