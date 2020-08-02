@@ -122,14 +122,14 @@ export class ThemeSwitcherService {
           { themeVariable: '--ion-color-tertiary-shade', value: '#6a6a6a' },
           { themeVariable: '--ion-color-tertiary-tint', value: '#868686' },
 
-          { themeVariable: '--ion-color-success', value: '#054e22' },
+          { themeVariable: '--ion-color-success', value: '#508364' },
           { themeVariable: '--ion-color-success-rgb', value: '5,78,34' },
           { themeVariable: '--ion-color-success-contrast', value: '#ffffff' },
           { themeVariable: '--ion-color-success-contrast-rgb', value: '255,255,255' },
           { themeVariable: '--ion-color-success-shade', value: '#04451e' },
           { themeVariable: '--ion-color-success-tint', value: '#1e6038' },
 
-          { themeVariable: '--ion-color-warning', value: '#773c00' },
+          { themeVariable: '--ion-color-warning', value: '#ffab66' },
           { themeVariable: '--ion-color-warning-rgb', value: '119,60,0' },
           { themeVariable: '--ion-color-warning-contrast', value: '#ffffff' },
           { themeVariable: '--ion-color-warning-contrast-rgb', value: '255,255,255' },

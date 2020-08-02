@@ -42,5 +42,6 @@ export interface MoveTree {
     level: number,
     order: number,
     move: string,
-    fen: string
+    fen: string,
+    quality: string
 }

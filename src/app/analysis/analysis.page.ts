@@ -88,7 +88,8 @@ export class AnalysisPage implements OnInit, OnDestroy {
       level: 0,
       order: num - 1,
       move: '[0]',
-      fen: fen
+      fen: fen,
+      quality: null
     };
     this.currentMove = this.moveTree;
   }
@@ -182,7 +183,8 @@ export class AnalysisPage implements OnInit, OnDestroy {
         level: this.currentMove.level + 1,
         move: movement,
         order: this.currentMove.order + (this.chessboard.turn() == 'b' ? 1 : 0),
-        fen: this.chessboard.fen()
+        fen: this.chessboard.fen(),
+        quality: null
       };
       this.currentMove.children.push(move);
       this.currentMove = move;
@@ -203,6 +205,24 @@ export class AnalysisPage implements OnInit, OnDestroy {
       }
       this.chessboard.showFen(this.currentMove.fen);
       this.updateInfoText();
+    }
+  }
+
+  btnQualityUpClick() {
+    if (this.currentMove != this.moveTree) {
+      if (this.currentMove.quality == null)
+        this.currentMove.quality = '+';
+      else if (this.currentMove.quality == '-')
+      this.currentMove.quality = null;
+    }
+  }
+
+  btnQualityDownClick() {
+    if (this.currentMove != this.moveTree) {
+      if (this.currentMove.quality == null)
+        this.currentMove.quality = '-';
+      else if (this.currentMove.quality == '+')
+      this.currentMove.quality = null;
     }
   }
 
