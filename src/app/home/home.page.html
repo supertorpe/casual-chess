@@ -23,15 +23,15 @@
 
       <ion-list *ngIf="gameCreated">
         <ion-item>
-          <ion-label (click)="navctrl.navigateRoot('/position/' + game.wid)">{{ 'home.link-white-player' | translate }}</ion-label>
+          <ion-label (click)="navCtrl.navigateRoot('/position/' + game.wid)">{{ 'home.link-white-player' | translate }}</ion-label>
           <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyWhiteLink()"></ion-icon>
         </ion-item>
         <ion-item>
-          <ion-label (click)="navctrl.navigateRoot('/position/' + game.bid)">{{ 'home.link-black-player' | translate }}</ion-label>
+          <ion-label (click)="navCtrl.navigateRoot('/position/' + game.bid)">{{ 'home.link-black-player' | translate }}</ion-label>
           <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyBlackLink()"></ion-icon>
         </ion-item>
         <ion-item>
-          <ion-label (click)="navctrl.navigateRoot('/position/' + game.vid)">{{ 'home.link-viewer' | translate }}</ion-label>
+          <ion-label (click)="navCtrl.navigateRoot('/position/' + game.vid)">{{ 'home.link-viewer' | translate }}</ion-label>
           <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyViewerLink()"></ion-icon>
         </ion-item>
       </ion-list>
