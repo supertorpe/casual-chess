@@ -1,0 +1,87 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{'position.newgame-dialog.title' | translate}}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="btnCloseClick()">
+                <ion-icon name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content fullscreen class="ion-padding" scroll-y="false">
+    <ion-slides #slider pager="true">
+        <ion-slide>
+            <p>{{'position.newgame-dialog.slide1text' | translate}}</p>
+            <ion-button expand="block" color="medium" size="large" (click)="setPlayerType('w')">
+                <img slot="start" class="thumbnail"
+                    src="/assets/pieces/{{configuration.pieceTheme}}/wP.svg" />
+                    {{'position.newgame-dialog.white' | translate}}
+            </ion-button>
+            <ion-button expand="block" color="medium" size="large" (click)="setPlayerType('b')">
+                <img slot="start" class="thumbnail"
+                    src="/assets/pieces/{{configuration.pieceTheme}}/bP.svg" />
+                    {{'position.newgame-dialog.black' | translate}}
+            </ion-button>
+        </ion-slide>
+        <ion-slide>
+            <p *ngIf="playerType == 'w'">{{'position.newgame-dialog.white-selected' | translate}}</p>
+            <p *ngIf="playerType == 'b'">{{'position.newgame-dialog.black-selected' | translate}}</p>
+            <p>{{'position.newgame-dialog.write-name' | translate}}</p>
+            <ion-input #nametext maxlength="25" required="true" placeholder="Nombre de la partida"></ion-input>
+            <ion-button expand="block" color="medium" (click)="setGameName()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+        </ion-slide>
+        <ion-slide>
+            <ng-container *ngIf="game">
+            <p>{{'position.newgame-dialog.last-text1' | translate}}</p>
+            <ng-container *ngIf="playerType == 'b'">
+                <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
+                <ion-button expand="block" color="medium" size="large" (click)="copyWhiteLink()">
+                    {{'position.newgame-dialog.copy' | translate}}
+                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+            </ng-container>
+            <ng-container *ngIf="playerType == 'w'">
+                <ion-label (click)="copyBlackLink()">http://casual-chess.web.app/position/{{ game.bid }}</ion-label>
+                <ion-button expand="block" color="medium" size="large" (click)="copyBlackLink()">
+                    {{'position.newgame-dialog.copy' | translate}}
+                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+            </ng-container>
+            <p>{{'position.newgame-dialog.last-text2' | translate}}</p>
+            <ion-button expand="block" color="medium" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+            </ng-container>
+        </ion-slide>
+        <ion-slide>
+            <ng-container *ngIf="game">
+            <p>{{'position.newgame-dialog.last-text3' | translate}}</p>
+            <ng-container *ngIf="playerType == 'w'">
+                <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
+                <ion-button expand="block" color="medium" size="large" (click)="copyWhiteLink()">
+                    {{'position.newgame-dialog.copy' | translate}}
+                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+            </ng-container>
+            <ng-container *ngIf="playerType == 'b'">
+                <ion-label (click)="copyBlackLink()">http://casual-chess.web.app/position/{{ game.bid }}</ion-label>
+                <ion-button expand="block" color="medium" size="large" (click)="copyBlackLink()">
+                    {{'position.newgame-dialog.copy' | translate}}
+                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+            </ng-container>
+            <p>{{'position.newgame-dialog.last-text4' | translate}}</p>
+            <ion-button expand="block" color="medium" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+            </ng-container>
+        </ion-slide>
+        <ion-slide>
+            <ng-container *ngIf="game">
+            <p>{{'position.newgame-dialog.last-text5' | translate}}</p>
+            <ion-label (click)="copyViewerLink()">http://casual-chess.web.app/position/{{ game.vid }}</ion-label>
+            <ion-button expand="block" color="medium" size="large" (click)="copyViewerLink()">
+                {{'position.newgame-dialog.copy' | translate}}
+                <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+            </ion-button>
+            <ion-button expand="block" color="medium" (click)="showGame()">{{'position.newgame-dialog.start-game' | translate}}</ion-button>
+            </ng-container>
+        </ion-slide>
+    </ion-slides>
+</ion-content>

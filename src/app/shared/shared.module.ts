@@ -16,6 +16,7 @@ import { PromotionDialog } from '../dialogs/promotion.dialog';
 import { ClipboardDialog } from '../dialogs/clipboard.dialog';
 import { FlagDialog } from '../dialogs/flag.dialog';
 import { AnalysisDialog } from '../dialogs/analysis.dialog';
+import { NewgameDialog } from '../dialogs/newgame.dialog';
 
 const providers = [
     UtilsService, ConfigurationService, ThemeSwitcherService, BoardThemeSwitcherService];
@@ -28,9 +29,9 @@ const providers = [
             NgxLazyModule,
             TranslateModule.forChild()
         ],
-        declarations: [ChunksPipe, PreferencesPage, NgNoCheck,PromotionDialog,ClipboardDialog,FlagDialog,AnalysisDialog],
+        declarations: [ChunksPipe, PreferencesPage, NgNoCheck,PromotionDialog,ClipboardDialog,FlagDialog,AnalysisDialog,NewgameDialog],
         providers: [],
-        entryComponents: [PreferencesPage,PromotionDialog,ClipboardDialog,FlagDialog,AnalysisDialog],
+        entryComponents: [PreferencesPage,PromotionDialog,ClipboardDialog,FlagDialog,AnalysisDialog,NewgameDialog],
         exports: [
             CommonModule,
             FormsModule,

@@ -90,6 +90,25 @@
             "title": "Select or create a new one",
             "frompos": "From position",
             "create": "New analysis"
+        },
+        "newgame-dialog": {
+            "title": "Start new game",
+            "slide1text": "You are going to start a new game. What pieces do you want to handle?",
+            "white": "White",
+            "black": "Black",
+            "white-selected": "You have selected white pieces",
+            "black-selected": "You have selected black pieces",
+            "write-name": "Please indicate a name for your game. This way you can easily locate it later.",
+            "name-required": "Give the game a name, please",
+            "continue": "Continue",
+            "copy": "Copy",
+            "last-text1": "Your game has already been created. You have to send your opponent the following link, so that he can access the game",
+            "last-text2": "That link is private and only needs to be used by your opponent, as anyone who has access to the link will be able to move the pieces on their behalf.",
+            "last-text3": "This is your link to the game:",
+            "last-text4": "Your link is private and personal. Put it in a safe place as it allows you to enter your game. Do not share it with anyone, unless you want others to be able to move your pieces.",
+            "last-text5": "Finally, the following link is for viewers. If you want other people to be able to watch your game, share the following link:",
+            "start-game": "Go to the game",
+            "link-copied": "Link copied to clipboard"
         }
     },
     "name-dialog" : {

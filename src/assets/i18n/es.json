@@ -96,6 +96,25 @@
             "name": "Nombre",
             "cancel": "Cancelar",
             "accept": "Aceptar"
+        },
+        "newgame-dialog": {
+            "title": "Iniciar nueva partida",
+            "slide1text": "Vas a iniciar una nueva partida. ¿Qué piezas quieres manejar?",
+            "white": "Blancas",
+            "black": "Negras",
+            "white-selected": "Has seleccionado piezas blancas",
+            "black-selected": "Has seleccionado piezas negras",
+            "write-name": "Por favor, indica un nombre para tu partida. De este modo podrás localizarla más adelante con facilidad.",
+            "name-required": "Dale un nombre a la partida, por favor",
+            "continue": "Continuar",
+            "copy": "Copiar",
+            "last-text1": "Ya se ha creado tu partida. Tienes que enviarle a tu oponente el siguiente enlace, para que pueda entrar en la partida",
+            "last-text2": "Ese enlace es privado y sólo tiene que usarlo tu oponente, ya que cualquiera que tenga acceso al enlace, podrá mover las piezas en su nombre.",
+            "last-text3": "Este es tu enlace a la partida:",
+            "last-text4": "Tu enlace es privado y personal. Ponlo a buen recaudo ya que te permite entrar en tu partida. No lo compartas con nadie, a menos que quieras que otros puedan mover tus piezas.",
+            "last-text5": "Por último, el siguiente enlace es para los espectadores. Si quieres que otras personas puedan observar vuestra partida, compárteles el siguiente enlace:",
+            "start-game": "Ir a la partida",
+            "link-copied": "Enlace copiado al portapapeles"
         }
     },
     "analysis": {
