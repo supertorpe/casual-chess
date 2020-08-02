@@ -88,6 +88,14 @@
             "title": "Seleccione o cree uno nuevo",
             "frompos": "Desde posición",
             "create": "Nuevo análisis"
+        },
+        "name-dialog" : {
+            "title": "Atención",
+            "subtitle": "Nombre para la partida",
+            "message": "Aún no le ha asignado un nombre a la partida. Indique un nombre para identificarla más fácilmente.",
+            "name": "Nombre",
+            "cancel": "Cancelar",
+            "accept": "Aceptar"
         }
     },
     "analysis": {

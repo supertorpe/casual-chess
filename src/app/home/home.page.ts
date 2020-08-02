@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, NavController } from '@ionic/angular';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { TranslateService } from '@ngx-translate/core';
 import { Game, UtilsService, ConfigurationService, Configuration, Player } from '../shared';
@@ -29,6 +29,7 @@ export class HomePage implements OnInit, OnDestroy {
   constructor(
     private toast: ToastController,
     public translate: TranslateService,
+    public navCtrl: NavController,
     private afs: AngularFirestore,
     public alertController: AlertController,
     private configurationService: ConfigurationService,

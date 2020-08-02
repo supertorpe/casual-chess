@@ -23,37 +23,53 @@
 
       <ion-list *ngIf="gameCreated">
         <ion-item>
-          <ion-label><a href="https://casual-chess.web.app/position/{{game.wid}}">{{ 'home.link-white-player' | translate }}</a></ion-label>
-          <ion-icon color="medium" name="clipboard" style="cursor:pointer" (click)="copyWhiteLink()"></ion-icon>
+          <ion-label (click)="navctrl.navigateRoot('/position/' + game.wid)">{{ 'home.link-white-player' | translate }}</ion-label>
+          <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyWhiteLink()"></ion-icon>
         </ion-item>
         <ion-item>
-          <ion-label><a href="https://casual-chess.web.app/position/{{game.bid}}">{{ 'home.link-black-player' | translate }}</a></ion-label>
-          <ion-icon color="medium" name="clipboard" style="cursor:pointer" (click)="copyBlackLink()"></ion-icon>
+          <ion-label (click)="navctrl.navigateRoot('/position/' + game.bid)">{{ 'home.link-black-player' | translate }}</ion-label>
+          <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyBlackLink()"></ion-icon>
         </ion-item>
         <ion-item>
-          <ion-label><a href="https://casual-chess.web.app/position/{{game.vid}}">{{ 'home.link-viewer' | translate }}</a></ion-label>
-          <ion-icon color="medium" name="clipboard" style="cursor:pointer" (click)="copyViewerLink()"></ion-icon>
+          <ion-label (click)="navctrl.navigateRoot('/position/' + game.vid)">{{ 'home.link-viewer' | translate }}</ion-label>
+          <ion-icon color="medium" name="clipboard-outline" style="cursor:pointer" (click)="copyViewerLink()"></ion-icon>
         </ion-item>
       </ion-list>
 
-      <ion-grid>
-        <ion-row *ngFor="let g of games; trackBy: trackFunc">
-          <ng-container *ngIf="g.wpkey == playerKey || g.bpkey == playerKey">
-            <ion-col size="4"><a href="/position/{{g.wpkey == playerKey ? g.wid : g.bid}}"><ion-label color="medium">{{g.timestamp.toDate() | date: 'dd/MM/yyyy hh:mm:ss'}}</ion-label></a></ion-col>
-            <ion-col size="1"><a href="/position/{{g.wpkey == playerKey ? g.wid : g.bid}}"><img *ngNoCheck class="thumbnail" ngxLazy="/assets/pieces/{{configuration.pieceTheme}}/{{g.wpkey == playerKey ? 'w' : 'b'}}P.svg" /></a></ion-col>
-            <ion-col size="4"><a href="/position/{{g.wpkey == playerKey ? g.wid : g.bid}}"><ion-label color="medium">{{g.statusDescription}}</ion-label></a></ion-col>
-            <ion-col size="1"><a href="/position/{{g.wpkey == playerKey ? g.wid : g.bid}}"><ion-icon color="medium" slot="icon-only" name="{{ g.status == 'WWI' || g.status == 'BWI' || g.status == 'DRA' || g.status == 'WRE' || g.status == 'BRE' ? 'eye' : 'play'}}"></ion-icon></a></ion-col>
-            <ion-col size="1"><ion-icon color="medium" name="trash-outline" style="cursor:pointer" (click)="delete(g)"></ion-icon></ion-col>
-          </ng-container>
-          <ng-container *ngIf="g.wpkey != playerKey && g.bpkey != playerKey">
-            <ion-col size="4"><a href="/position/{{g.vid}}"><ion-label color="medium">{{g.timestamp.toDate() | date: 'dd/MM/yyyy hh:mm:ss'}}</ion-label></a></ion-col>
-            <ion-col size="1"><a href="/position/{{g.vid}}"><ion-icon color="medium" style="zoom:2.0;" name="eye-outline"></ion-icon></a></ion-col>
-            <ion-col size="4"><a href="/position/{{g.vid}}"><ion-label color="medium">{{g.statusDescription}}</ion-label></a></ion-col>
-            <ion-col size="1"><a href="/position/{{g.vid}}"><ion-icon color="medium" slot="icon-only" name="eye"></ion-icon></a></ion-col>
-            <ion-col size="1"><ion-icon color="medium" name="trash-outline" style="cursor:pointer" (click)="removeStar(g)"></ion-icon></ion-col>
-          </ng-container>
-        </ion-row>
-      </ion-grid>
+      <ion-list>
+        <ng-container *ngFor="let g of games; trackBy: trackFunc">
+          <ion-item-sliding *ngIf="g.wpkey == playerKey || g.bpkey == playerKey">
+            <ion-item (click)="navCtrl.navigateRoot('/position/' + (g.wpkey == playerKey ? g.wid : g.bid))">
+            <ion-avatar slot="start">
+              <img *ngNoCheck class="thumbnail" ngxLazy="/assets/pieces/{{configuration.pieceTheme}}/{{g.wpkey == playerKey ? 'w' : 'b'}}P.svg" />
+            </ion-avatar>
+            <ion-label>
+              <h2>{{g.timestamp.toDate() | date: 'dd/MM/yyyy hh:mm:ss'}}</h2>
+              <h3>{{g.wpkey == playerKey ? g.wpname : g.bpkey == playerKey ? g.bpname : ''}}</h3>
+              <p>{{g.statusDescription}}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option (click)="delete(g)"><ion-icon color="medium" style="zoom:2.0;" name="trash-outline" style="cursor:pointer"></ion-icon></ion-item-option>
+          </ion-item-options>
+          </ion-item-sliding>
+          <ion-item-sliding *ngIf="g.wpkey != playerKey && g.bpkey != playerKey">
+            <ion-item (click)="navCtrl.navigateRoot('/position/' + g.vid)">
+            <ion-avatar slot="start">
+              <ion-icon color="medium" style="zoom:2.0;" name="eye-outline"></ion-icon>
+            </ion-avatar>
+            <ion-label>
+              <h2>{{g.timestamp.toDate() | date: 'dd/MM/yyyy hh:mm:ss'}}</h2>
+              <h3></h3>
+              <p>{{g.statusDescription}}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option (click)="removeStar(g)"><ion-icon color="medium" style="zoom:2.0;" name="trash-outline" style="cursor:pointer"></ion-icon></ion-item-option>
+          </ion-item-options>
+          </ion-item-sliding>
+        </ng-container>
+      </ion-list>
     </ion-card-content>
   </ion-card>
 </ion-content>

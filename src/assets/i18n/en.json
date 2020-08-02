@@ -92,6 +92,14 @@
             "create": "New analysis"
         }
     },
+    "name-dialog" : {
+        "title": "Attention",
+        "subtitle": "Name for the game",
+        "message": "You have not assigned a name to the game yet. Enter a name to identify it easily.",
+        "name": "Name",
+        "cancel": "Cancel",
+        "accept": "Accept"
+    },
     "analysis": {
         "saved": "Analysis saved",
         "save-before-copy": "Save analysis before sharing"

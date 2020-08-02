@@ -101,7 +101,13 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.in',
         'position.moves',
         'position.ups',
-        'position.ok'
+        'position.ok',
+        'position.name-dialog.title',
+        'position.name-dialog.subtitle',
+        'position.name-dialog.message',
+        'position.name-dialog.name',
+        'position.name-dialog.cancel',
+        'position.name-dialog.accept'
       ]).subscribe(async res => {
         this.texts = res;
         this.subscriptions.push(
@@ -218,8 +224,47 @@ export class PositionPage implements OnInit, OnDestroy {
     // TO DO: when player not found
   }
 
+  async queryGameName() {
+    const alert = await this.alertController.create({
+      header: this.texts['position.name-dialog.title'],
+      subHeader: this.texts['position.name-dialog.subtitle'],
+      message: this.texts['position.name-dialog.message'],
+      inputs: [
+        {
+          name: 'inputtext',
+          type: 'text',
+          placeholder: this.texts['position.name-dialog.name']
+        }],
+      buttons: [
+        {
+          text: this.texts['position.name-dialog.cancel'],
+          role: 'cancel',
+          cssClass: 'overlay-button',
+          handler: () => {
+            // do nothing
+          }
+        }, {
+          text: this.texts['position.name-dialog.accept'],
+          cssClass: 'overlay-button',
+          handler: (alertData) => {
+            console.log(alertData.inputtext);
+            if (this.playerType == 'w')
+              this.game.wpname = alertData.inputtext;
+            else if (this.playerType == 'b')
+              this.game.bpname = alertData.inputtext;
+            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   private loadGame(game: Game) {
     this.game = game;
+    if ((this.playerType == 'w' && !this.game.wpname) || (this.playerType == 'b' && !this.game.bpname)) {
+      this.queryGameName();
+    }
     if (!this.gameLoaded) {
       this.gameLoaded = true;
       // set player pid and name
