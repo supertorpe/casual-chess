@@ -248,7 +248,7 @@ export class AnalysisPage implements OnInit, OnDestroy {
   }
 
   btnReturnClick() {
-    this.navCtrl.navigateRoot(this.returnUrl);
+    this.navCtrl.navigateRoot(this.returnUrl + '?embed=' + this.embed);
   }
 
   private async clipboardDialog(): Promise<string> {

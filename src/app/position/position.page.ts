@@ -643,7 +643,7 @@ export class PositionPage implements OnInit, OnDestroy {
   }
 
   btnAnalysisClick() {
-    this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?returnUrl=/position/' + this.id);
+    this.navCtrl.navigateRoot('/analysis/' + this.chessboard.fen() + '?embed=' + this.embed + '&returnUrl=/position/' + this.id);
   }
 
   parsePgn(pgn: string) {
