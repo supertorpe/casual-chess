@@ -104,6 +104,7 @@ export class NewgameDialog implements OnInit, OnDestroy {
         this.afs.collection<Game>('games').add(this.game).then(result => {
           this.game.uid = result.id;
           this.afs.collection<Game>('games').doc(result.id).update(this.game).then(() => {
+            this.utils.linkGameToUser(this.game, this.playerType);
             this.showNextSlide();
           });
         });

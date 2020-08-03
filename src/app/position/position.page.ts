@@ -157,73 +157,6 @@ export class PositionPage implements OnInit, OnDestroy {
     this.subscriptions = [];
   }
 
-  private createPlayer() {
-    const player: Player = {
-      uid: null,
-      pid: this.utils.uuidv4(),
-      name: null,
-      stars: []
-    };
-    this.afs.collection<Player>('players').add(player).then(result => {
-      player.uid = result.id;
-      this.afs.collection<Player>('players').doc(result.id).update(player).then(() => {
-        // player created: update config
-        this.configuration.pid = player.pid;
-        this.configurationService.save();
-        this.game[`${this.playerType}pkey`] = player.uid;
-        this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-      });
-    });
-  }
-
-  private loadPlayerFromGame() {
-    // read player
-    this.subscriptions.push(this.afs.doc<Player>('players/' + this.game[`${this.playerType}pkey`])
-      .valueChanges()
-      .subscribe(player => {
-        // update config
-        this.configuration.pid = player.pid;
-        this.configuration.name = player.name;
-        this.configurationService.save();
-      }));
-    // TO DO : when player not found
-  }
-
-  private setGamePlayer() {
-    // get player data
-    this.subscriptions.push(this.afs.collection<Player>('players', ref => {
-      return ref.where('pid', '==', this.configuration.pid)
-    })
-      .valueChanges()
-      .subscribe(players => {
-        if (players == null || players.length == 0) {
-          // TO DO: when player not found
-        } else {
-          this.game[`${this.playerType}pkey`] = players[0].uid;
-          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-        }
-      }));
-  }
-
-  private checkGamePlayer() {
-    // get player data
-    this.subscriptions.push(this.afs.collection<Player>('players', ref => {
-      return ref.where('pid', '==', this.configuration.pid)
-    })
-      .valueChanges()
-      .subscribe(players => {
-        if (players == null || players.length == 0) {
-          // TO DO: when player not found
-        } else //if ((this.playerType == 'w' && this.game.wpkey != players[0].uid) || (this.playerType == 'b' && this.game.bpkey != players[0].uid)) {
-          if (this.game[`${this.playerType}pkey`] != players[0].uid) {
-            // resync player uid
-            this.game[`${this.playerType}pkey`] = players[0].uid;
-            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-          }
-      }));
-    // TO DO: when player not found
-  }
-
   async queryGameName() {
     const alert = await this.alertController.create({
       header: this.texts['position.name-dialog.title'],
@@ -269,17 +202,7 @@ export class PositionPage implements OnInit, OnDestroy {
       }
       // set player pid and name
       if (this.playerType !== 'v') {
-        if (this.configuration.pid == null) {
-          if (game[`${this.playerType}pkey`] == null) {
-            this.createPlayer();
-          } else {
-            this.loadPlayerFromGame();
-          }
-        } else if (game[`${this.playerType}pkey`] == null) {
-          this.setGamePlayer();
-        } else {
-          this.checkGamePlayer();
-        }
+        this.utils.linkGameToUser(this.game, this.playerType);
       }
       this.checkGameStatus();
       this.chessboard.build(game.pgn, this.playerType, game.status);
