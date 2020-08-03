@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { Subscription } from 'rxjs';
 
-import { ConfigurationService, Configuration, ThemeSwitcherService, BoardThemeSwitcherService } from './shared';
+import { ConfigurationService, Configuration, ThemeSwitcherService, BoardThemeSwitcherService, NotificationsService } from './shared';
 
 @Component({
   selector: 'app-root',
@@ -54,7 +54,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private configurationService: ConfigurationService,
     private themeSwitcherService: ThemeSwitcherService,
-    private boardThemeSwitcherService: BoardThemeSwitcherService
+    private boardThemeSwitcherService: BoardThemeSwitcherService,
+    private notificationsService: NotificationsService
   ) {
     this.translate.setDefaultLang('en');
     this.translate.use(this.translate.getBrowserLang());
@@ -66,6 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    alert('destrucción!!!!!!');
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
     this.subscriptions = [];
   }
@@ -75,6 +77,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private initializeApp() {
+    this.notificationsService.requestSubscription();
     this.router.events.subscribe(evt => {
       if (evt instanceof NavigationStart) {
         if (evt.url.startsWith('/position') && evt.url.endsWith('embed=true'))

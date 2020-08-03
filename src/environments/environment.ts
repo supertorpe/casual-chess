@@ -15,7 +15,9 @@ export const environment = {
   },
   imgur: {
     clientId: "[CLIENT_ID]"
-  }
+  },
+  vapidPublicKey: "[VAPID_PUBLIC_KEY]",
+  sendNotificationUrl: "[NOTIFICATION_URL]"
 };
 
 /*

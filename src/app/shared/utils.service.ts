@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Game, Player, Configuration } from './model';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ConfigurationService } from './configuration.service';
+import { NotificationsService } from './notifications.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,10 @@ export class UtilsService {
 
   public configuration: Configuration;
   
-  constructor(private afs: AngularFirestore, private configurationService: ConfigurationService) {
+  constructor(
+    private afs: AngularFirestore,
+    private configurationService: ConfigurationService,
+    private notificationsService: NotificationsService) {
     this.configurationService.initialize().then(config => {
       this.configuration = config;
     });
@@ -42,7 +46,8 @@ export class UtilsService {
       uid: null,
       pid: this.uuidv4(),
       name: null,
-      stars: []
+      stars: [],
+      pushSubscription: null
     };
     this.afs.collection<Player>('players').add(player).then(result => {
       player.uid = result.id;
@@ -52,6 +57,7 @@ export class UtilsService {
         this.configurationService.save();
         game[`${playerType}pkey`] = player.uid;
         this.afs.collection<Game>('games').doc(game.uid).update(game);
+        this.notificationsService.requestSubscription();
       });
     });
   }
@@ -64,7 +70,7 @@ export class UtilsService {
         // update config
         this.configuration.pid = player.pid;
         this.configuration.name = player.name;
-        this.configurationService.save();
+        this.configurationService.save().then(() => this.notificationsService.requestSubscription())
       });
     // TO DO : when player not found
   }

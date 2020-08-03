@@ -96,6 +96,8 @@ export class NewgameDialog implements OnInit, OnDestroy {
           bpkey: null,
           wpname: (this.playerType == 'w' ? this.gameName : null),
           bpname: (this.playerType == 'b' ? this.gameName : null),
+          wpnotif: true,
+          bpnotif: true,
           pgn: '',
           gameover: false,
           wdeleted: false,

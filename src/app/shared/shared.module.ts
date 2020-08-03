@@ -17,9 +17,10 @@ import { ClipboardDialog } from '../dialogs/clipboard.dialog';
 import { FlagDialog } from '../dialogs/flag.dialog';
 import { AnalysisDialog } from '../dialogs/analysis.dialog';
 import { NewgameDialog } from '../dialogs/newgame.dialog';
+import { NotificationsService } from './notifications.service';
 
 const providers = [
-    UtilsService, ConfigurationService, ThemeSwitcherService, BoardThemeSwitcherService];
+    UtilsService, ConfigurationService, ThemeSwitcherService, BoardThemeSwitcherService, NotificationsService];
 
     @NgModule({
         imports: [

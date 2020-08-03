@@ -69,6 +69,7 @@
         "ups": "¡Ohhh!",
         "ok": "Aceptar",
         "draw-rejected": "Oferta de tablas rechazada",
+        "move-notification-text": "El oponente ha movido. Es tu turno",
         "clipboard": {
             "title": "¿Qué quieres copiar?"
         },

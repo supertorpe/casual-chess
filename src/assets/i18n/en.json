@@ -71,6 +71,7 @@
         "ups": "Oooops!",
         "ok": "OK",
         "draw-rejected": "Draw offer rejected",
+        "move-notification-text": "Opponent has moved. It is your turn.",
         "clipboard": {
             "title": "Select what to copy"
         },

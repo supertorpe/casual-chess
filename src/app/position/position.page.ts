@@ -45,6 +45,7 @@ export class PositionPage implements OnInit, OnDestroy {
   public autoplaying = false;
   public intervalPlay;
   public texts: any;
+  private opponent: Player;
 
   @ViewChild('chessboard', { static: true }) chessboard: ChessboardComponent;
   @ViewChild('fab', { static: true }) fab: any;
@@ -107,7 +108,8 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.name-dialog.message',
         'position.name-dialog.name',
         'position.name-dialog.cancel',
-        'position.name-dialog.accept'
+        'position.name-dialog.accept',
+        'move-notification-text'
       ]).subscribe(async res => {
         this.texts = res;
         this.subscriptions.push(
@@ -203,6 +205,7 @@ export class PositionPage implements OnInit, OnDestroy {
       // set player pid and name
       if (this.playerType !== 'v') {
         this.utils.linkGameToUser(this.game, this.playerType);
+        this.loadOpponent();
       }
       this.checkGameStatus();
       this.chessboard.build(game.pgn, this.playerType, game.status);
@@ -216,6 +219,24 @@ export class PositionPage implements OnInit, OnDestroy {
     if (this.game.status == 'WOD' && this.playerType == 'b' || this.game.status == 'BOD' && this.playerType == 'w') {
       this.showDrawOfferDialog();
     }
+  }
+
+  loadOpponent() {
+    let opponentKey = null;
+    if (this.playerType == 'w')
+      opponentKey = this.game.bpkey;
+    else if (this.playerType == 'b')
+      opponentKey = this.game.wpkey;
+    if (opponentKey == null)
+      return;
+    this.afs.doc<Player>('players/' + opponentKey)
+      .valueChanges()
+      .subscribe(player => {
+        if (!player.hasOwnProperty('pushSubscription') || player.pushSubscription == null) {
+          return;
+        }
+        this.opponent = player;
+      });
   }
 
   async showDrawOfferDialog() {
@@ -354,6 +375,34 @@ export class PositionPage implements OnInit, OnDestroy {
       this.game.status = 'BTR';
     }
     this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+    this.sendNotification();
+  }
+
+  sendNotification() {
+    if (this.playerType == 'w' && this.game.hasOwnProperty('bpnotif') && !this.game.bpnotif)
+      return;
+    if (this.playerType == 'b' && this.game.hasOwnProperty('wpnotif') && !this.game.wpnotif)
+      return;
+    if (this.opponent && this.opponent.pushSubscription) {
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json; charset=utf-8',
+          'Accept': '"application/json; charset=utf-8',
+          'Access-Control-Allow-Origin': '*'
+        })
+      };
+      const formData = {
+        jsonSub: this.opponent.pushSubscription,
+        notificationTitle: 'Casual Chess',
+        notificationBody: this.texts['move-notification-text']
+      };
+      this.http.post<any>(environment.sendNotificationUrl, formData, httpOptions)
+        .subscribe(
+          data => { console.log(data); },
+          err => { },
+          () => { }
+        );
+    }
   }
 
   async onGameOver(values: string[]) {
@@ -668,6 +717,23 @@ export class PositionPage implements OnInit, OnDestroy {
       pos++;
     });
   }
+
+  toggleNotifications() {
+    if (this.playerType == 'w') {
+      if (!this.game.hasOwnProperty('wpnotif'))
+        this.game.wpnotif = false;
+      else
+        this.game.wpnotif = !this.game.wpnotif;
+    }
+    else if (this.playerType == 'b') {
+      if (!this.game.hasOwnProperty('bpnotif'))
+        this.game.bpnotif = false;
+      else
+        this.game.bpnotif = !this.game.bpnotif;
+    }
+    this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+  }
+
   trackFunc(index: number, obj: any) {
     return index;
   }

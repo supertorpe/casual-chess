@@ -13,7 +13,8 @@ export interface Player {
     uid: string,
     pid: string,
     name: string,
-    stars: string[]
+    stars: string[],
+    pushSubscription: string
 }
 
 export interface Game {
@@ -28,6 +29,8 @@ export interface Game {
     bpkey: string,
     wpname: string,
     bpname: string,
+    wpnotif: boolean,
+    bpnotif: boolean,
     pgn: string
     gameover: boolean,
     wdeleted: boolean,

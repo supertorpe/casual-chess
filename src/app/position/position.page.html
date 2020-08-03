@@ -6,6 +6,9 @@
     <ion-title class="padding-0 ion-text-center">
       {{infotext}}
     </ion-title>
+    <ion-button *ngIf="game && (playerType == 'w' || playerType == 'b')" color="medium" slot="end" (click)="toggleNotifications()">
+      <ion-icon name="{{(playerType == 'w' && game.wpnotif != false) || (playerType == 'b' && game.bpnotif != false) ? 'notifications-outline': 'notifications-off-outline'}}"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 <ion-content>

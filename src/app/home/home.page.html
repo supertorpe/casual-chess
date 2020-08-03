@@ -24,7 +24,7 @@
       <ion-list>
         <ng-container *ngFor="let g of games; trackBy: trackFunc">
           <ion-item-sliding *ngIf="g.wpkey == playerKey || g.bpkey == playerKey">
-            <ion-item (click)="navCtrl.navigateRoot('/position/' + (g.wpkey == playerKey ? g.wid : g.bid))">
+            <ion-item style="cursor:pointer" (click)="navCtrl.navigateRoot('/position/' + (g.wpkey == playerKey ? g.wid : g.bid))">
             <ion-avatar slot="start">
               <img *ngNoCheck class="thumbnail" ngxLazy="/assets/pieces/{{configuration.pieceTheme}}/{{g.wpkey == playerKey ? 'w' : 'b'}}P.svg" />
             </ion-avatar>
@@ -39,7 +39,7 @@
           </ion-item-options>
           </ion-item-sliding>
           <ion-item-sliding *ngIf="g.wpkey != playerKey && g.bpkey != playerKey">
-            <ion-item (click)="navCtrl.navigateRoot('/position/' + g.vid)">
+            <ion-item style="cursor:pointer" (click)="navCtrl.navigateRoot('/position/' + g.vid)">
             <ion-avatar slot="start">
               <ion-icon color="medium" style="zoom:2.0;" name="eye-outline"></ion-icon>
             </ion-avatar>
