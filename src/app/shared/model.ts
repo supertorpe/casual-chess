@@ -39,6 +39,24 @@ export interface Game {
     statusDescription?: string
 }
 
+/*
+  -----------------------------
+  GAME STATUS
+  -----------------------------
+  WTR: White Turn
+  BTR: Black Turn
+  WWI: White Wins
+  BWI: Black Wins
+  DRA: Draw
+  WOD: White Offers Draw
+  BOD: Black Offers Draw
+  WRD: White Rejects Draw offer
+  BRD: Black Rejects Draw offer
+  WRE: White Resigns
+  BRE: Black Resigns
+  -----------------------------
+*/
+
 export interface MoveTree {
     parent: MoveTree,
     children: MoveTree[],
