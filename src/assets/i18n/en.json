@@ -46,6 +46,7 @@
         "checkmate": "checkmate",
         "draw": "Draw",
         "draw-offer-rejected": "Draw offer rejected",
+        "request-undo-rejected": "Undo request rejected",
         "white-won": "White won",
         "black-won": "Black won",
         "moves": "moves",
@@ -70,7 +71,6 @@
         "in": "in",
         "ups": "Oooops!",
         "ok": "OK",
-        "draw-rejected": "Draw offer rejected",
         "move-notification-text": "Opponent has moved. It is your turn.",
         "clipboard": {
             "title": "Select what to copy"
@@ -78,12 +78,20 @@
         "flag": {
             "title": "What do you want to do?",
             "abandon": "Resign",
-            "offer-draw": "Offer draw"
+            "offer-draw": "Offer draw",
+            "request-undo": "Request undo my lastest move"
         },
         "draw-dialog": {
             "title": "Attention",
             "subtitle": "Draw offer",
             "message": "The opponent offers you draw, do you want to accept or reject it?",
+            "cancel": "Reject",
+            "accept": "Accept"
+        },
+        "undo-dialog": {
+            "title": "Attention",
+            "subtitle": "Undo move",
+            "message": "The opponent asks you to undo the last move. Do you want to accept or reject it",
             "cancel": "Reject",
             "accept": "Accept"
         },

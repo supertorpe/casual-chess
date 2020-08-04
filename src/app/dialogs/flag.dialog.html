@@ -26,5 +26,13 @@
                 </ion-button>
             </ion-col>
         </ion-row>
+        <ion-row *ngIf="showRequestUndo=='true'">
+            <ion-col>
+                <ion-button (click)="requestUndo()" color="light" size="large" expand="full">
+                    <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+                    <ion-label>{{'position.flag.request-undo' | translate}}</ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
     </ion-grid>
 </ion-content>

@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class FlagDialog {
 
   @Input() showOfferDraw: string;
+  @Input() showRequestUndo: string;
 
   constructor(public modalController: ModalController, public translate: TranslateService) {
   }
@@ -19,6 +20,9 @@ export class FlagDialog {
   }
   offerDraw() {
     this.modalController.dismiss('offer-draw');
+  }
+  requestUndo() {
+    this.modalController.dismiss('request-undo');
   }
 
   btnCloseClick() {

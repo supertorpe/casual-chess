@@ -52,6 +52,10 @@ export interface Game {
   BOD: Black Offers Draw
   WRD: White Rejects Draw offer
   BRD: Black Rejects Draw offer
+  WRU: White Request Undo move
+  BRU: Black Request Undo move
+  WNU: White Rejects Undo move
+  BNU: Black Rejects Undo move
   WRE: White Resigns
   BRE: Black Resigns
   -----------------------------

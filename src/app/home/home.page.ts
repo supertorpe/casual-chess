@@ -171,7 +171,7 @@ export class HomePage implements OnInit, OnDestroy {
                       } else {
                         game.statusDescription = this.texts['home.black-won'];
                       }
-                    } else if (game.status == 'WTR' || game.status == 'WOD' || game.status == 'BRD') {
+                    } else if (game.status == 'WTR' || game.status == 'WOD' || game.status == 'BRD' || game.status == 'BRU' || game.status == 'WNU') {
                       if (game.wpkey == this.playerKey) {
                         game.statusDescription = this.texts['home.your-turn'];
                       } else if (game.bpkey == this.playerKey) {
@@ -179,7 +179,7 @@ export class HomePage implements OnInit, OnDestroy {
                       } else {
                         game.statusDescription = this.texts['home.white-turn'];
                       }
-                    } else if (game.status == 'BTR' || game.status == 'BOD' || game.status == 'WRD') {
+                    } else if (game.status == 'BTR' || game.status == 'BOD' || game.status == 'WRD' || game.status == 'WRU' || game.status == 'BNU') {
                       if (game.wpkey == this.playerKey) {
                         game.statusDescription = this.texts['home.not-your-turn'];
                       } else if (game.bpkey == this.playerKey) {

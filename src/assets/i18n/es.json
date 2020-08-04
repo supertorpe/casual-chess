@@ -46,6 +46,7 @@
         "checkmate": "mate",
         "draw": "Tablas",
         "draw-offer-rejected": "Oferta de tablas rechazada",
+        "request-undo-rejected": "Solicitud para deshacer movimiento rechazada",
         "moves": "movimientos",
         "your-turn": "Tu turno",
         "not-your-turn": "Turno del adversario",
@@ -68,7 +69,6 @@
         "in": "en",
         "ups": "¡Ohhh!",
         "ok": "Aceptar",
-        "draw-rejected": "Oferta de tablas rechazada",
         "move-notification-text": "El oponente ha movido. Es tu turno",
         "clipboard": {
             "title": "¿Qué quieres copiar?"
@@ -76,12 +76,20 @@
         "flag": {
             "title": "¿Qué deseas hacer?",
             "abandon": "Abandonar",
-            "offer-draw": "Ofrecer tablas"
+            "offer-draw": "Ofrecer tablas",
+            "request-undo": "Solicitar deshacer movimiento"
         },
         "draw-dialog": {
             "title": "Atención",
             "subtitle": "Oferta de tablas",
             "message": "El oponente le ofrece tablas, ¿desea aceptarlas o rechazarlas?",
+            "cancel": "Rechazar",
+            "accept": "Aceptar"
+        },
+        "undo-dialog": {
+            "title": "Atención",
+            "subtitle": "Deshacer movimiento",
+            "message": "El oponente le solicita deshacer su último movimiento. ¿Acepta?",
             "cancel": "Rechazar",
             "accept": "Aceptar"
         },

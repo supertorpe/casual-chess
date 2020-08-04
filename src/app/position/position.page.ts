@@ -84,6 +84,7 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.gameover',
         'position.draw',
         'position.draw-offer-rejected',
+        'position.request-undo-rejected',
         'position.congratulations',
         'position.review',
         'position.spectator-link-clipboard',
@@ -98,7 +99,11 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.draw-dialog.message',
         'position.draw-dialog.cancel',
         'position.draw-dialog.accept',
-        'position.draw-rejected',
+        'position.undo-dialog.title',
+        'position.undo-dialog.subtitle',
+        'position.undo-dialog.message',
+        'position.undo-dialog.cancel',
+        'position.undo-dialog.accept',
         'position.in',
         'position.moves',
         'position.ups',
@@ -218,6 +223,8 @@ export class PositionPage implements OnInit, OnDestroy {
     }
     if (this.game.status == 'WOD' && this.playerType == 'b' || this.game.status == 'BOD' && this.playerType == 'w') {
       this.showDrawOfferDialog();
+    } else if (this.game.status == 'WRU' && this.playerType == 'b' || this.game.status == 'BRU' && this.playerType == 'w') {
+      this.showConfirmUndoDialog();
     }
   }
 
@@ -271,6 +278,35 @@ export class PositionPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  async showConfirmUndoDialog() {
+    const alert = await this.alertController.create({
+      header: this.texts['position.undo-dialog.title'],
+      subHeader: this.texts['position.undo-dialog.subtitle'],
+      message: this.texts['position.undo-dialog.message'],
+      buttons: [
+        {
+          text: this.texts['position.undo-dialog.cancel'],
+          role: 'cancel',
+          cssClass: 'overlay-button',
+          handler: () => {
+            if (this.playerType == 'w')
+              this.game.status = 'WNU';
+            else if (this.playerType == 'b')
+              this.game.status = 'BNU';
+            this.game.lastupdated = new Date();
+            this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+          }
+        }, {
+          text: this.texts['position.undo-dialog.accept'],
+          cssClass: 'overlay-button',
+          handler: () => {
+            this.chessboard.undoMove();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
   checkGameStatus() {
     if (!this.game.status) {
       const auxChess: Chess = new Chess();
@@ -303,6 +339,27 @@ export class PositionPage implements OnInit, OnDestroy {
         duration: 3000
       });
       toast.present();
+      if (this.game.status == 'WRD') {
+        this.game.status = 'BTR';
+      } else if (this.game.status == 'BRD') {
+        this.game.status = 'WBTR';
+      }
+      this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+    }
+    if (this.game.status == 'WNU' && this.playerType == 'b' || this.game.status == 'BNU' && this.playerType == 'w') {
+      const toast = await this.toast.create({
+        message: this.texts['position.request-undo-rejected'],
+        position: 'middle',
+        color: 'warning',
+        duration: 3000
+      });
+      toast.present();
+      if (this.game.status == 'WNU') {
+        this.game.status = 'WTR';
+      } else if (this.game.status == 'BNU') {
+        this.game.status = 'BTR';
+      }
+      this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
     }
     if (this.game.status == 'DRA') {
       this.infotext = this.texts['position.draw'];
@@ -528,7 +585,10 @@ export class PositionPage implements OnInit, OnDestroy {
     return new Promise<string>(async resolve => {
       const modal = await this.modalController.create({
         component: FlagDialog,
-        componentProps: { showOfferDraw: (this.chessboard.turn() == this.playerType ? 'true' : 'false') }
+        componentProps: {
+          showOfferDraw: (this.chessboard.turn() == this.playerType ? 'true' : 'false'),
+          showRequestUndo: (this.chessboard.turn() == this.playerType ? 'false' : 'true')
+        }
       });
       modal.present();
       const { data } = await modal.onDidDismiss();
@@ -542,26 +602,41 @@ export class PositionPage implements OnInit, OnDestroy {
 
   btnFlagClick() {
     this.flagDialog().then(async what => {
+      let update = false;
       if (what) {
         if ('abandon' == what) {
-          this.chessboard.cleanPlayer();
-          if (this.playerType == 'w') {
+          if (this.playerType == 'w' && this.game.status != 'WRE') {
             this.game.status = 'WRE';
-          } else if (this.playerType == 'b') {
+            update = true;
+          } else if (this.playerType == 'b' && this.game.status != 'BRE') {
             this.game.status = 'BRE';
+            update = true;
           }
-          this.game.lastupdated = new Date();
-          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-          this.updateInfoText();
+          if (update) {
+            this.chessboard.cleanPlayer();
+            this.updateInfoText();
+          }
         } else if ('offer-draw' == what) {
-          if (this.playerType == 'w') {
+          if (this.playerType == 'w' && this.game.status != 'WOD') {
             this.game.status = 'WOD';
-          } else if (this.playerType == 'b') {
+            update = true;
+          } else if (this.playerType == 'b' && this.game.status != 'BOD') {
             this.game.status = 'BOD';
+            update = true;
           }
-          this.game.lastupdated = new Date();
-          this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+        } else if ('request-undo' == what) {
+          if (this.playerType == 'w' && this.game.status != 'WRU') {
+            this.game.status = 'WRU';
+            update = true;
+          } else if (this.playerType == 'b' && this.game.status != 'BRU') {
+            this.game.status = 'BRU';
+            update = true;
+          }
         }
+      }
+      if (update) {
+        this.game.lastupdated = new Date();
+        this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
       }
     });
   }

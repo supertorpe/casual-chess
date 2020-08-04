@@ -76,9 +76,11 @@ Analysis button: displays an analysis board to explore variants from the current
 
 <img style="margin-left:10px;" src="screenshots/flag-button.png">
 
-Abandon / offer draw: displays a dialog box that allows you to leave the game or offer tables (this only if it is your turn):
+Abandon / Offer draw / Undo move: displays a dialog box that allows you to leave the game or offer tables (if it is your turn) or request undo your latest move (if it is not your turn):
 
 <img style="margin-left:10px;" src="screenshots/abandon-offer-draw.png">
+
+<img style="margin-left:10px;" src="screenshots/abandon-undo.png">
 
 ## The analysis board
 

@@ -148,6 +148,18 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             this.player = '';
     }
 
+    undoMove() {
+        this.cleanHighlights();
+        this.chess.undo();
+        this.board.position(this.chess.fen());
+        this.chessHistory = this.chess.history();
+        if (this.configuration.playSounds) {
+            this.playAudio('move');
+        }
+        this.pointer--;
+        this.playerMoved.emit();
+    }
+
     cleanPlayer() {
         this.player = '';
     }
