@@ -70,6 +70,7 @@
         "ups": "¡Ohhh!",
         "ok": "Aceptar",
         "move-notification-text": "El oponente ha movido. Es tu turno",
+        "not-both-pieces": "No puede jugar con ambas piezas a la vez",
         "clipboard": {
             "title": "¿Qué quieres copiar?"
         },

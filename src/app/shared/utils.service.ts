@@ -3,6 +3,8 @@ import { Game, Player, Configuration } from './model';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ConfigurationService } from './configuration.service';
 import { NotificationsService } from './notifications.service';
+import { throwError, Subject } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,7 @@ import { NotificationsService } from './notifications.service';
 export class UtilsService {
 
   public configuration: Configuration;
-  
+
   constructor(
     private afs: AngularFirestore,
     private configurationService: ConfigurationService,
@@ -27,21 +29,21 @@ export class UtilsService {
     });
   }
 
-  linkGameToUser(game: Game, playerType: string) {
+  linkGameToUser(game: Game, playerType: string, theSubject : Subject<boolean>) {
     if (this.configuration.pid == null) {
       if (game[`${playerType}pkey`] == null) {
-        this.createPlayer(game, playerType);
+        this.createPlayer(game, playerType, theSubject);
       } else {
-        this.loadPlayerFromGame(game, playerType);
+        this.loadPlayerFromGame(game, playerType, theSubject);
       }
     } else if (game[`${playerType}pkey`] == null) {
-      this.setGamePlayer(game, playerType);
+      this.setGamePlayer(game, playerType, theSubject);
     } else {
-      this.checkGamePlayer(game, playerType);
+      this.checkGamePlayer(game, playerType, theSubject);
     }
   }
 
-  private createPlayer(game: Game, playerType: string) {
+  private createPlayer(game: Game, playerType: string, theSubject : Subject<boolean>) {
     const player: Player = {
       uid: null,
       pid: this.uuidv4(),
@@ -58,11 +60,12 @@ export class UtilsService {
         game[`${playerType}pkey`] = player.uid;
         this.afs.collection<Game>('games').doc(game.uid).update(game);
         this.notificationsService.requestSubscription();
+        theSubject.next(true);
       });
     });
   }
 
-  private loadPlayerFromGame(game: Game, playerType: string) {
+  private loadPlayerFromGame(game: Game, playerType: string, theSubject : Subject<boolean>) {
     // read player
     this.afs.doc<Player>('players/' + game[`${playerType}pkey`])
       .valueChanges()
@@ -70,44 +73,59 @@ export class UtilsService {
         // update config
         this.configuration.pid = player.pid;
         this.configuration.name = player.name;
-        this.configurationService.save().then(() => this.notificationsService.requestSubscription())
+        this.configurationService.save().then(() => this.notificationsService.requestSubscription());
+        theSubject.next(true);
       });
     // TO DO : when player not found
   }
 
-  private setGamePlayer(game: Game, playerType: string) {
+  private setGamePlayer(game: Game, playerType: string, theSubject : Subject<boolean>) {
     // get player data
-    this.afs.collection<Player>('players', ref => {
+    return this.afs.collection<Player>('players', ref => {
       return ref.where('pid', '==', this.configuration.pid)
     })
       .valueChanges()
       .subscribe(players => {
         if (players == null || players.length == 0) {
           // TO DO: when player not found
+          theSubject.next(false);
         } else {
-          game[`${playerType}pkey`] = players[0].uid;
-          this.afs.collection<Game>('games').doc(game.uid).update(game);
+          const opponent = (playerType == 'w' ? 'b' : 'w');
+          if (game[`${opponent}pkey`] != players[0].uid) {
+            game[`${playerType}pkey`] = players[0].uid;
+            this.afs.collection<Game>('games').doc(game.uid).update(game);
+            theSubject.next(true);
+          } else {
+            theSubject.next(false);
+          }
         }
       });
   }
 
-  private checkGamePlayer(game: Game, playerType: string) {
+  private checkGamePlayer(game: Game, playerType: string, theSubject : Subject<boolean>) {
     // get player data
-    this.afs.collection<Player>('players', ref => {
+    return this.afs.collection<Player>('players', ref => {
       return ref.where('pid', '==', this.configuration.pid)
     })
       .valueChanges()
       .subscribe(players => {
         if (players == null || players.length == 0) {
           // TO DO: when player not found
-        } else //if ((this.playerType == 'w' && this.game.wpkey != players[0].uid) || (this.playerType == 'b' && this.game.bpkey != players[0].uid)) {
-          if (game[`${playerType}pkey`] != players[0].uid) {
+          theSubject.next(false);
+        } else if (game[`${playerType}pkey`] == players[0].uid) {
+          theSubject.next(true);
+        } else {
+          const opponent = (playerType == 'w' ? 'b' : 'w');
+          if (game[`${opponent}pkey`] != players[0].uid) {
             // resync player uid
             game[`${playerType}pkey`] = players[0].uid;
             this.afs.collection<Game>('games').doc(game.uid).update(game);
-          }
+            theSubject.next(true);
+          } else {
+            theSubject.next(false);
+          } 
+        }
       });
-    // TO DO: when player not found
   }
-  
+
 }

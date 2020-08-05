@@ -72,6 +72,7 @@
         "ups": "Oooops!",
         "ok": "OK",
         "move-notification-text": "Opponent has moved. It is your turn.",
+        "not-both-pieces": "Can't play both pieces at the same time",
         "clipboard": {
             "title": "Select what to copy"
         },

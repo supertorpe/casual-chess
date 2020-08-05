@@ -3,7 +3,7 @@ import { ModalController, ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigurationService } from '../shared/configuration.service';
 import { Configuration, Game } from '../shared/model';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { UtilsService } from '../shared/utils.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 
@@ -106,7 +106,8 @@ export class NewgameDialog implements OnInit, OnDestroy {
         this.afs.collection<Game>('games').add(this.game).then(result => {
           this.game.uid = result.id;
           this.afs.collection<Game>('games').doc(result.id).update(this.game).then(() => {
-            this.utils.linkGameToUser(this.game, this.playerType);
+            let theSubject = new Subject<boolean>();
+            this.utils.linkGameToUser(this.game, this.playerType, theSubject);
             this.showNextSlide();
           });
         });

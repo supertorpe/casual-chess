@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ConfigurationService, Configuration, Game, UtilsService, Player, Analysis } from '../shared';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { AlertController, MenuController, ToastController, ModalController, Platform, NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ChessboardComponent } from '../chessboard';
@@ -114,7 +114,8 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.name-dialog.name',
         'position.name-dialog.cancel',
         'position.name-dialog.accept',
-        'position.move-notification-text'
+        'position.move-notification-text',
+        'position.not-both-pieces'
       ]).subscribe(async res => {
         this.texts = res;
         this.subscriptions.push(
@@ -187,7 +188,6 @@ export class PositionPage implements OnInit, OnDestroy {
           text: this.texts['position.name-dialog.accept'],
           cssClass: 'overlay-button',
           handler: (alertData) => {
-            console.log(alertData.inputtext);
             if (this.playerType == 'w')
               this.game.wpname = alertData.inputtext;
             else if (this.playerType == 'b')
@@ -204,13 +204,27 @@ export class PositionPage implements OnInit, OnDestroy {
     this.game = game;
     if (!this.gameLoaded) {
       this.gameLoaded = true;
-      if ((this.playerType == 'w' && !this.game.wpname) || (this.playerType == 'b' && !this.game.bpname)) {
-        this.queryGameName();
-      }
       // set player pid and name
       if (this.playerType !== 'v') {
-        this.utils.linkGameToUser(this.game, this.playerType);
-        this.loadOpponent();
+        let theSubject = new Subject<boolean>();
+        this.utils.linkGameToUser(this.game, this.playerType, theSubject);
+        theSubject.subscribe(async result => {
+          if (result) {
+            if ((this.playerType == 'w' && !this.game.wpname) || (this.playerType == 'b' && !this.game.bpname)) {
+              this.queryGameName();
+            }
+            this.loadOpponent();
+          } else {
+            const toast = await this.toast.create({
+              message: this.texts['position.not-both-pieces'],
+              position: 'middle',
+              color: 'warning',
+              duration: 3000
+            });
+            toast.present();
+            this.navCtrl.navigateRoot('/home');
+          }
+        })
       }
       this.checkGameStatus();
       this.chessboard.build(game.pgn, this.playerType, game.status);
@@ -455,7 +469,7 @@ export class PositionPage implements OnInit, OnDestroy {
       };
       this.http.post<any>(environment.sendNotificationUrl, formData, httpOptions)
         .subscribe(
-          data => { console.log(data); },
+          data => { },
           err => { },
           () => { }
         );
