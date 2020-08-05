@@ -114,7 +114,7 @@ export class PositionPage implements OnInit, OnDestroy {
         'position.name-dialog.name',
         'position.name-dialog.cancel',
         'position.name-dialog.accept',
-        'move-notification-text'
+        'position.move-notification-text'
       ]).subscribe(async res => {
         this.texts = res;
         this.subscriptions.push(
@@ -451,7 +451,7 @@ export class PositionPage implements OnInit, OnDestroy {
       const formData = {
         jsonSub: this.opponent.pushSubscription,
         notificationTitle: 'Casual Chess',
-        notificationBody: this.texts['move-notification-text']
+        notificationBody: this.texts['position.move-notification-text']
       };
       this.http.post<any>(environment.sendNotificationUrl, formData, httpOptions)
         .subscribe(
