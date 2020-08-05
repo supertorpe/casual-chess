@@ -81,10 +81,6 @@ export class AnalysisPage implements OnInit, OnDestroy {
       'analysis.save-before-copy'
     ]).subscribe(async res => {
       this.texts = res;
-
-
-
-
       this.configurationService.initialize().then(config => {
         this.configuration = config;
         this.subscriptions.push(
@@ -149,7 +145,8 @@ export class AnalysisPage implements OnInit, OnDestroy {
     this.analysis = null;
     this.fen = fen;
     const parts = fen.split(' ');
-    this.startingPos = +parts[parts.length - 1];
+    const activePlayer = parts[1];
+    this.startingPos = +parts[parts.length - 1] + (activePlayer == 'w' ? 0 : 1);
     this.chessboard.build(fen);
     this.updateInfoText();
     this.moveTree = {
