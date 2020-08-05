@@ -22,7 +22,7 @@
     <div class="info_wrapper" *ngIf="game">
       <div class="info">
         <ng-container *ngFor="let moves of parsedPgn; trackBy: trackFunc; let idx = index;">
-        {{idx+1}}.<ng-container *ngFor="let move of moves; trackBy: trackFunc; let idx2 = index"><ion-label style="cursor:pointer; font-weight: {{(idx*2 + idx2 == chessboard.currentPosition()) ? 'bold' : 'normal'}}" [color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'dark' : 'medium'" (click)="this.autoplaying ? true : chessboard.showPosition(idx*2 + idx2)">&nbsp;{{move}}</ion-label></ng-container>
+        {{idx+1}}.<ng-container *ngFor="let move of moves; trackBy: trackFunc; let idx2 = index"><ion-label style="cursor:pointer; font-weight: {{(idx*2 + idx2 == chessboard.currentPosition()) ? 'bold' : 'normal'}}" [style.background-color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'var(--ion-color-tertiary)' : ''" [color]="(idx*2 + idx2 == chessboard.currentPosition()) ? 'dark' : 'medium'" (click)="this.autoplaying ? true : chessboard.showPosition(idx*2 + idx2)">&nbsp;{{move}}</ion-label></ng-container>
         </ng-container>
       </div>
       <div class="action_buttons" *ngIf="game">
