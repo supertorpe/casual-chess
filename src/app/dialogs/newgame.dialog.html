@@ -37,7 +37,7 @@
                 <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
                 <ion-toolbar>
                     <ion-button color="medium" (click)="copyWhiteLink()">
-                        <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                        <ion-icon color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
                     </ion-button>
                     <ion-button color="medium" (click)="shareWhiteLinkWhatsapp()">
                         <ion-icon color="light" name="logo-whatsapp" style="cursor:pointer"></ion-icon>
@@ -77,6 +77,7 @@
             <ng-container *ngIf="playerType == 'w'">
                 <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
                 <ion-button expand="block" color="medium" size="large" (click)="copyWhiteLink()">
+                    {{'position.newgame-dialog.copy' | translate}}
                     <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
                 </ion-button>
             </ng-container>
@@ -97,7 +98,7 @@
             <ion-label (click)="copyViewerLink()">http://casual-chess.web.app/position/{{ game.vid }}</ion-label>
             <ion-toolbar>
                 <ion-button color="medium" (click)="copyViewerLink()">
-                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                    <ion-icon color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
                 </ion-button>
                 <ion-button color="medium" (click)="shareViewerLinkWhatsapp()">
                     <ion-icon color="light" name="logo-whatsapp" style="cursor:pointer"></ion-icon>
