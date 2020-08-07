@@ -25,7 +25,7 @@ Next you assign a name to the game, to be able to locate it in the list of the h
 
 <img style="margin-left:10px;" src="screenshots/02_newgame_2.png">
 
-When creating the game 3 unique links are generated. One for the player with the white pieces, one for the player with the black pieces and one for spectators. The following screens allow you to copy these links to the clipboard, in order to share them.
+When creating the game 3 unique links are generated. One for the player with the white pieces, one for the player with the black pieces and one for spectators. The following screens allow you to copy these links to the clipboard or share them via whatsapp, telegram or email.
 Each player has to use their link and keep it a secret ... anyone with the link could move your pieces instead!
 
 <img style="margin-left:10px;" src="screenshots/02_newgame_3.png">
