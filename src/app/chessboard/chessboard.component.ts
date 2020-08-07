@@ -84,6 +84,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     private loadAudio() {
         this.sounds.push({ key: 'move', audio: new Howl({ src: ['/assets/audio/move.mp3'] }) });
+        this.sounds.push({ key: 'capture', audio: new Howl({ src: ['/assets/audio/capture.mp3'] }) });
         this.sounds.push({ key: 'success', audio: new Howl({ src: ['/assets/audio/success.mp3'] }) });
         this.sounds.push({ key: 'fail', audio: new Howl({ src: ['/assets/audio/fail.mp3'] }) });
     }
@@ -110,7 +111,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         const self = this;
         if (pgn != null) {
             this.chess.load_pgn(pgn);
-            this.chessHistory = this.chess.history();
+            this.chessHistory = this.chess.history({verbose:true});
             this.pointer = this.chessHistory.length - 1;
         } else {
             this.pointer = -1;
@@ -140,10 +141,12 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     update(pgn: string, gameStatus: string) {
         this.chess.load_pgn(pgn);
-        this.chessHistory = this.chess.history();
+        this.chessHistory = this.chess.history({verbose:true});
         this.pointer = this.chessHistory.length - 1;
         this.board.position(this.chess.fen());
-        this.checkGameOver();
+        if (!this.checkGameOver() && this.configuration.playSounds) {
+            this.playAudio(this.chessHistory[this.pointer].captured ? 'capture' : 'move');
+        }
         if (gameStatus == 'WRE' || gameStatus == 'BRE')
             this.player = '';
     }
@@ -152,7 +155,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         this.cleanHighlights();
         this.chess.undo();
         this.board.position(this.chess.fen());
-        this.chessHistory = this.chess.history();
+        this.chessHistory = this.chess.history({verbose:true});
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
@@ -264,7 +267,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             } else {
                 this.auxChess.reset();
                 for (let i = 0; i <= this.pointer; i++) {
-                    this.auxChess.move(this.chessHistory[i]);
+                    this.auxChess.move(this.chessHistory[i].san);
                 }
             }
             return this.auxChess.fen();
@@ -273,10 +276,10 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     private showFenPointer() {
         this.cleanHighlights();
-        if (this.configuration.playSounds) {
-            this.playAudio('move');
-        }
         this.board.position(this.fen(), true);
+        if (!this.checkGameOver() && this.configuration.playSounds && this.pointer >= 0 && this.chessHistory.length > this.pointer) {
+            this.playAudio(this.chessHistory[this.pointer].captured ? 'capture' : 'move');
+        }
     }
 
     private async promoteDialog(): Promise<string> {
@@ -364,7 +367,6 @@ export class ChessboardComponent implements OnInit, OnDestroy {
                     this.playAudio('fail');
                 }
             }
-
             this.gameOver.emit([message,status]);
             return true;
         } else {
@@ -373,20 +375,12 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     }
 
     private registerMove(source, target, promotion) {
-        this.chess.move({
+        const move = this.chess.move({
             from: source,
             to: target,
             promotion: promotion
         });
-        this.chessHistory = this.chess.history();
-        if (this.configuration.playSounds) {
-            this.playAudio('move');
-        }
-        //this.fenHistory.push(this.chess.fen());
-        this.pointer++;
-
         this.playerMoved.emit();
-        this.checkGameOver(false);
     }
 
     private onMoveEnd(source, target) {

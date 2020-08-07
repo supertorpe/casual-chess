@@ -82,6 +82,7 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
 
     private loadAudio() {
         this.sounds.push({ key: 'move', audio: new Howl({ src: ['/assets/audio/move.mp3'] }) });
+        this.sounds.push({ key: 'capture', audio: new Howl({ src: ['/assets/audio/capture.mp3'] }) });
         this.sounds.push({ key: 'success', audio: new Howl({ src: ['/assets/audio/success.mp3'] }) });
         this.sounds.push({ key: 'fail', audio: new Howl({ src: ['/assets/audio/fail.mp3'] }) });
     }
@@ -247,18 +248,18 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
     }
 
     private registerMove(source, target, promotion) {
-        this.chess.move({
+        const move = this.chess.move({
             from: source,
             to: target,
             promotion: promotion
         });
-        if (this.configuration.playSounds) {
-            this.playAudio('move');
-        }
         const history = this.chess.history();
         this.playerMoved.emit(history[history.length - 1]);
         if (!this.checkGameOver(false)) {
             this.player = (this.player == 'w' ? 'b' : 'w');
+            if (this.configuration.playSounds) {
+                this.playAudio(move.captured ? 'capture' : 'move');
+            }
         }
     }
 
