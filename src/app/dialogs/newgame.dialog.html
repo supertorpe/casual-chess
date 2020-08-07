@@ -27,7 +27,7 @@
             <p *ngIf="playerType == 'w'">{{'position.newgame-dialog.white-selected' | translate}}</p>
             <p *ngIf="playerType == 'b'">{{'position.newgame-dialog.black-selected' | translate}}</p>
             <p>{{'position.newgame-dialog.write-name' | translate}}</p>
-            <ion-input #nametext maxlength="25" required="true" placeholder="Nombre de la partida"></ion-input>
+            <ion-input #nametext maxlength="25" required="true" placeholder="{{'position.newgame-dialog.game-name' | translate}}"></ion-input>
             <ion-button expand="block" color="medium" (click)="setGameName()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
         </ion-slide>
         <ion-slide>

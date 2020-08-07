@@ -110,6 +110,7 @@
             "black-selected": "You have selected black pieces",
             "write-name": "Please indicate a name for your game. This way you can easily locate it later.",
             "name-required": "Give the game a name, please",
+            "game-name": "Name for the game",
             "continue": "Continue",
             "copy": "Copy",
             "last-text1": "Your game has already been created. You have to send your opponent the following link, so that he can access the game",

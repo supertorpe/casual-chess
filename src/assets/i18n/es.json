@@ -116,6 +116,7 @@
             "black-selected": "Has seleccionado piezas negras",
             "write-name": "Por favor, indica un nombre para tu partida. De este modo podrás localizarla más adelante con facilidad.",
             "name-required": "Dale un nombre a la partida, por favor",
+            "game-name": "Nombre para la partida",
             "continue": "Continuar",
             "copy": "Copiar",
             "last-text1": "Ya se ha creado tu partida. Tienes que enviarle a tu oponente el siguiente enlace, para que pueda entrar en la partida",
