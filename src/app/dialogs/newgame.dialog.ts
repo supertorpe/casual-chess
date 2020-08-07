@@ -45,7 +45,8 @@ export class NewgameDialog implements OnInit, OnDestroy {
     this.slider.lockSwipes(true);
     this.subscriptions.push(this.translate.get([
       'position.newgame-dialog.name-required',
-      'position.newgame-dialog.link-copied'
+      'position.newgame-dialog.link-copied',
+      'position.newgame-dialog.share-message'
     ]).subscribe(async res => {
       this.texts = res;
     }));
@@ -119,12 +120,48 @@ export class NewgameDialog implements OnInit, OnDestroy {
     this.copyToClipboard(`https://casual-chess.web.app/position/${this.game.wid}`);
   }
 
+  shareWhiteLinkWhatsapp() {
+    window.open(`https://api.whatsapp.com/send?text=${this.texts['position.newgame-dialog.share-message']}: https://casual-chess.web.app/position/${this.game.wid}`, "_blank");
+  }
+
+  shareWhiteLinkTelegram() {
+    window.open(`https://telegram.me/share/url?url=https://casual-chess.web.app/position/${this.game.wid}&text=${this.texts['position.newgame-dialog.share-message']}`, "_blank");
+  }
+
+  shareWhiteLinkMail() {
+    window.open(`mailto:?subject=${this.texts['position.newgame-dialog.share-message']}&body=https://casual-chess.web.app/position/${this.game.wid}`, "_blank");
+  }
+
   copyBlackLink() {
     this.copyToClipboard(`https://casual-chess.web.app/position/${this.game.bid}`);
   }
 
+  shareBlackLinkWhatsapp() {
+    window.open(`https://api.whatsapp.com/send?text=${this.texts['position.newgame-dialog.share-message']}: https://casual-chess.web.app/position/${this.game.bid}`, "_blank");
+  }
+
+  shareBlackLinkTelegram() {
+    window.open(`https://telegram.me/share/url?url=https://casual-chess.web.app/position/${this.game.bid}&text=${this.texts['position.newgame-dialog.share-message']}`, "_blank");
+  }
+
+  shareBlackLinkMail() {
+    window.open(`mailto:?subject=${this.texts['position.newgame-dialog.share-message']}&body=https://casual-chess.web.app/position/${this.game.bid}`, "_blank");
+  }
+
   copyViewerLink() {
     this.copyToClipboard(`https://casual-chess.web.app/position/${this.game.vid}`);
+  }
+
+  shareViewerLinkWhatsapp() {
+    window.open(`https://api.whatsapp.com/send?text=${this.texts['position.newgame-dialog.share-message2']}: https://casual-chess.web.app/position/${this.game.vid}`, "_blank");
+  }
+
+  shareViewerLinkTelegram() {
+    window.open(`https://telegram.me/share/url?url=https://casual-chess.web.app/position/${this.game.vid}&text=${this.texts['position.newgame-dialog.share-message2']}`, "_blank");
+  }
+
+  shareViewerLinkMail() {
+    window.open(`mailto:?subject=${this.texts['position.newgame-dialog.share-message2']}&body=https://casual-chess.web.app/position/${this.game.vid}`, "_blank");
   }
   
   copyToClipboard(content: string) {

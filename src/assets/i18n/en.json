@@ -111,6 +111,8 @@
             "write-name": "Please indicate a name for your game. This way you can easily locate it later.",
             "name-required": "Give the game a name, please",
             "game-name": "Name for the game",
+            "share-message": "I am sending you a link to play chess with me",
+            "share-message2": "I send you a link so you can see my chess game",
             "continue": "Continue",
             "copy": "Copy",
             "last-text1": "Your game has already been created. You have to send your opponent the following link, so that he can access the game",

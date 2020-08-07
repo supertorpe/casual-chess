@@ -28,27 +28,47 @@
             <p *ngIf="playerType == 'b'">{{'position.newgame-dialog.black-selected' | translate}}</p>
             <p>{{'position.newgame-dialog.write-name' | translate}}</p>
             <ion-input #nametext maxlength="25" required="true" placeholder="{{'position.newgame-dialog.game-name' | translate}}"></ion-input>
-            <ion-button expand="block" color="medium" (click)="setGameName()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+            <ion-button expand="block" color="medium" size="large" (click)="setGameName()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
         </ion-slide>
         <ion-slide>
             <ng-container *ngIf="game">
             <p>{{'position.newgame-dialog.last-text1' | translate}}</p>
             <ng-container *ngIf="playerType == 'b'">
                 <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
-                <ion-button expand="block" color="medium" size="large" (click)="copyWhiteLink()">
-                    {{'position.newgame-dialog.copy' | translate}}
-                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
-                </ion-button>
+                <ion-toolbar>
+                    <ion-button color="medium" (click)="copyWhiteLink()">
+                        <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareWhiteLinkWhatsapp()">
+                        <ion-icon color="light" name="logo-whatsapp" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareWhiteLinkTelegram()">
+                        <ion-icon color="light" name="paper-plane-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareWhiteLinkMail()">
+                        <ion-icon color="light" name="mail-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                </ion-toolbar>
             </ng-container>
             <ng-container *ngIf="playerType == 'w'">
                 <ion-label (click)="copyBlackLink()">http://casual-chess.web.app/position/{{ game.bid }}</ion-label>
-                <ion-button expand="block" color="medium" size="large" (click)="copyBlackLink()">
-                    {{'position.newgame-dialog.copy' | translate}}
-                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
-                </ion-button>
+                <ion-toolbar>
+                    <ion-button color="medium" (click)="copyBlackLink()">
+                        <ion-icon color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareBlackLinkWhatsapp()">
+                        <ion-icon color="light" name="logo-whatsapp" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareBlackLinkTelegram()">
+                        <ion-icon color="light" name="paper-plane-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                    <ion-button color="medium" (click)="shareBlackLinkMail()">
+                        <ion-icon color="light" name="mail-outline" style="cursor:pointer"></ion-icon>
+                    </ion-button>
+                </ion-toolbar>
             </ng-container>
             <p>{{'position.newgame-dialog.last-text2' | translate}}</p>
-            <ion-button expand="block" color="medium" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+            <ion-button expand="block" color="medium" size="large" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
             </ng-container>
         </ion-slide>
         <ion-slide>
@@ -57,7 +77,6 @@
             <ng-container *ngIf="playerType == 'w'">
                 <ion-label (click)="copyWhiteLink()">http://casual-chess.web.app/position/{{ game.wid }}</ion-label>
                 <ion-button expand="block" color="medium" size="large" (click)="copyWhiteLink()">
-                    {{'position.newgame-dialog.copy' | translate}}
                     <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
                 </ion-button>
             </ng-container>
@@ -69,18 +88,28 @@
                 </ion-button>
             </ng-container>
             <p>{{'position.newgame-dialog.last-text4' | translate}}</p>
-            <ion-button expand="block" color="medium" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
+            <ion-button expand="block" color="medium" size="large" (click)="showNextSlide()">{{'position.newgame-dialog.continue' | translate}}</ion-button>
             </ng-container>
         </ion-slide>
         <ion-slide>
             <ng-container *ngIf="game">
             <p>{{'position.newgame-dialog.last-text5' | translate}}</p>
             <ion-label (click)="copyViewerLink()">http://casual-chess.web.app/position/{{ game.vid }}</ion-label>
-            <ion-button expand="block" color="medium" size="large" (click)="copyViewerLink()">
-                {{'position.newgame-dialog.copy' | translate}}
-                <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
-            </ion-button>
-            <ion-button expand="block" color="medium" (click)="showGame()">{{'position.newgame-dialog.start-game' | translate}}</ion-button>
+            <ion-toolbar>
+                <ion-button color="medium" (click)="copyViewerLink()">
+                    <ion-icon slot="end" color="light" name="clipboard-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+                <ion-button color="medium" (click)="shareViewerLinkWhatsapp()">
+                    <ion-icon color="light" name="logo-whatsapp" style="cursor:pointer"></ion-icon>
+                </ion-button>
+                <ion-button color="medium" (click)="shareViewerLinkTelegram()">
+                    <ion-icon color="light" name="paper-plane-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+                <ion-button color="medium" (click)="shareViewerLinkMail()">
+                    <ion-icon color="light" name="mail-outline" style="cursor:pointer"></ion-icon>
+                </ion-button>
+            </ion-toolbar>
+            <ion-button expand="block" color="medium" size="large" (click)="showGame()">{{'position.newgame-dialog.start-game' | translate}}</ion-button>
             </ng-container>
         </ion-slide>
     </ion-slides>
