@@ -209,7 +209,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             return;
         }
         this.pointer = -1;
-        this.showFenPointer();
+        this.showFenPointer(false);
     }
 
     showPosition(idx) {
@@ -225,7 +225,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
             return;
         }
         this.pointer--;
-        this.showFenPointer();
+        this.showFenPointer(false);
     }
 
     showNextPosition() {
@@ -274,11 +274,11 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    private showFenPointer() {
+    private showFenPointer(useCaptureSound = true) {
         this.cleanHighlights();
         this.board.position(this.fen(), true);
         if (!this.checkGameOver() && this.configuration.playSounds && this.pointer >= 0 && this.chessHistory.length > this.pointer) {
-            this.playAudio(this.chessHistory[this.pointer].captured ? 'capture' : 'move');
+            this.playAudio(useCaptureSound && this.chessHistory[this.pointer].captured ? 'capture' : 'move');
         }
     }
 
