@@ -277,8 +277,10 @@ export class ChessboardComponent implements OnInit, OnDestroy {
     private showFenPointer(useCaptureSound = true) {
         this.cleanHighlights();
         this.board.position(this.fen(), true);
-        if (!this.checkGameOver() && this.configuration.playSounds && this.pointer >= 0 && this.chessHistory.length > this.pointer) {
-            this.playAudio(useCaptureSound && this.chessHistory[this.pointer].captured ? 'capture' : 'move');
+        if (this.configuration.playSounds && this.pointer >= 0 && this.chessHistory.length > this.pointer) {
+            this.playAudio(
+                this.chessHistory[this.pointer].san.endsWith('#') ? 'success' :
+                useCaptureSound && this.chessHistory[this.pointer].captured ? 'capture' : 'move');
         }
     }
 
