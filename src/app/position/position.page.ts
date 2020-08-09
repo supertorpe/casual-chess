@@ -327,9 +327,9 @@ export class PositionPage implements OnInit, OnDestroy {
       auxChess.load_pgn(this.game.pgn);
       if (auxChess.in_checkmate()) {
         if (auxChess.turn() == 'w') {
-          this.game.status = 'WWI';
-        } else {
           this.game.status = 'BWI';
+        } else {
+          this.game.status = 'WWI';
         }
       } else if (auxChess.in_stalemate() || auxChess.insufficient_material() || auxChess.in_threefold_repetition() || auxChess.in_draw()) {
         this.game.status = 'DRA';
