@@ -144,7 +144,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         this.chessHistory = this.chess.history({verbose:true});
         this.pointer = this.chessHistory.length - 1;
         this.board.position(this.chess.fen());
-        if (!this.checkGameOver() && this.configuration.playSounds) {
+        if (this.pointer >= 0 && this.configuration.playSounds && !this.checkGameOver()) {
             this.playAudio(this.chessHistory[this.pointer].captured ? 'capture' : 'move');
         }
         if (gameStatus == 'WRE' || gameStatus == 'BRE')
