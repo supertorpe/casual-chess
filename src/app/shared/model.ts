@@ -35,7 +35,7 @@ export interface Game {
     gameover: boolean,
     wdeleted: boolean,
     bdeleted: boolean,
-    status? : string,
+    status : string,
     statusDescription?: string
 }
 

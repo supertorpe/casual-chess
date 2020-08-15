@@ -226,11 +226,9 @@ export class PositionPage implements OnInit, OnDestroy {
           }
         })
       }
-      this.checkGameStatus();
       this.chessboard.build(game.pgn, this.playerType, game.status);
       this.parsePgn(game.pgn);
     } else {
-      this.checkGameStatus();
       this.chessboard.update(game.pgn, game.status);
       this.parsePgn(game.pgn);
       this.updateInfoText();
@@ -320,28 +318,6 @@ export class PositionPage implements OnInit, OnDestroy {
       ]
     });
     await alert.present();
-  }
-  checkGameStatus() {
-    if (!this.game.status) {
-      const auxChess: Chess = new Chess();
-      auxChess.load_pgn(this.game.pgn);
-      if (auxChess.in_checkmate()) {
-        if (auxChess.turn() == 'w') {
-          this.game.status = 'BWI';
-        } else {
-          this.game.status = 'WWI';
-        }
-      } else if (auxChess.in_stalemate() || auxChess.insufficient_material() || auxChess.in_threefold_repetition() || auxChess.in_draw()) {
-        this.game.status = 'DRA';
-      } else {
-        if (auxChess.turn() == 'w') {
-          this.game.status = 'WTR';
-        } else {
-          this.game.status = 'BTR';
-        }
-      }
-      this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
-    }
   }
 
   async updateInfoText() {
@@ -476,19 +452,14 @@ export class PositionPage implements OnInit, OnDestroy {
     }
   }
 
-  async onGameOver(values: string[]) {
-    const message = values[0];
-    const status = values[1];
-    const toast = await this.toast.create({
-      message: message,
-      position: 'middle',
-      color: 'warning',
-      duration: 5000
-    });
-    toast.present();
+  async onGameOver(status: string) {
+    this.game.pgn = this.chessboard.pgn();
+    this.parsePgn(this.game.pgn);
+    this.game.lastupdated = new Date();
     this.game.gameover = true;
     this.game.status = status;
     this.afs.collection<Game>('games').doc(this.game.uid).update(this.game);
+    this.sendNotification();
   }
 
   private async settingsDialog(): Promise<Configuration> {

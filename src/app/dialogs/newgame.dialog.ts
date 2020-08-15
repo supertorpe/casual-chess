@@ -100,6 +100,7 @@ export class NewgameDialog implements OnInit, OnDestroy {
           wpnotif: true,
           bpnotif: true,
           pgn: '',
+          status: 'WTR',
           gameover: false,
           wdeleted: false,
           bdeleted: false

@@ -130,25 +130,6 @@ export class HomePage implements OnInit, OnDestroy {
                 ).subscribe(games => {
                   this.games = games;
                   this.games.forEach(game => {
-                    if (!game.status) {
-                      chess.load_pgn(game.pgn);
-                      if (chess.in_checkmate()) {
-                        if (chess.turn() == 'w') {
-                          game.status = 'WWI';
-                        } else {
-                          game.status = 'BWI';
-                        }
-                      } else if (chess.in_stalemate() || chess.insufficient_material() || chess.in_threefold_repetition() || chess.in_draw()) {
-                        game.status = 'DRA';
-                      } else {
-                        if (chess.turn() == 'w') {
-                          game.status = 'WTR';
-                        } else {
-                          game.status = 'BTR';
-                        }
-                      }
-                      this.afs.collection<Game>('games').doc(game.uid).update(game);
-                    }
                     if (game.status == 'DRA') {
                       game.statusDescription = this.texts['home.draw'];
                     } else if (game.status == 'WRE') {

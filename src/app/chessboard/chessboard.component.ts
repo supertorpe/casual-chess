@@ -33,7 +33,7 @@ export class ChessboardComponent implements OnInit, OnDestroy {
 
     @Output() warn: EventEmitter<string> = new EventEmitter<string>();
     @Output() playerMoved: EventEmitter<void> = new EventEmitter<void>();
-    @Output() gameOver: EventEmitter<string[]> = new EventEmitter<string[]>();
+    @Output() gameOver: EventEmitter<string> = new EventEmitter<string>();
 
     constructor(
         private configurationService: ConfigurationService,
@@ -144,7 +144,32 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         this.chessHistory = this.chess.history({verbose:true});
         this.pointer = this.chessHistory.length - 1;
         this.board.position(this.chess.fen());
-        if (this.pointer >= 0 && this.configuration.playSounds && !this.checkGameOver()) {
+
+        if (this.chess.game_over()) {
+            let message;
+            if (this.chess.in_checkmate()) {
+                message = 'Checkmate';
+            } else {
+                if (this.chess.in_stalemate())
+                    message = this.texts['chessboard.stalemate'];
+                else if (this.chess.insufficient_material())
+                    message = this.texts['chessboard.insufficent-material'];
+                else if (this.chess.in_threefold_repetition())
+                    message = this.texts['chessboard.three-repetition'];
+                else if (this.chess.in_draw())
+                    message = this.texts['chessboard.rule-fifty'];
+                else
+                    message = this.texts['chessboard.game-over'];
+            }
+            this.warn.emit(message);
+            if (this.configuration.playSounds && this.player != 'v') {
+                if (this.chess.in_checkmate() && this.player !== this.chess.turn()) {
+                    this.playAudio('success');
+                } else {
+                    this.playAudio('fail');
+                }
+            }
+        } else if (this.pointer >= 0 && this.configuration.playSounds) {
             this.playAudio(this.chessHistory[this.pointer].captured ? 'capture' : 'move');
         }
         if (gameStatus == 'WRE' || gameStatus == 'BRE')
@@ -337,52 +362,27 @@ export class ChessboardComponent implements OnInit, OnDestroy {
         }
     };
 
-    private checkGameOver(playsounds = true) {
-        if (this.chess.game_over()) {
-            let message;
-            let status;
-            if (this.chess.in_checkmate()) {
-                message = 'Checkmate';
-                if (this.chess.turn() == 'w') {
-                    status = 'WWI';
-                } else {
-                    status = 'BWI';
-                }
-            } else {
-                status = 'DRA';
-                if (this.chess.in_stalemate())
-                    message = this.texts['chessboard.stalemate'];
-                else if (this.chess.insufficient_material())
-                    message = this.texts['chessboard.insufficent-material'];
-                else if (this.chess.in_threefold_repetition())
-                    message = this.texts['chessboard.three-repetition'];
-                else if (this.chess.in_draw())
-                    message = this.texts['chessboard.rule-fifty'];
-                else
-                    message = this.texts['chessboard.game-over'];
-            }
-            //this.pointer = this.chess.history().length - 1;
-            if (playsounds && this.configuration.playSounds && this.player != 'v') {
-                if (this.chess.in_checkmate() && this.player !== this.chess.turn()) {
-                    this.playAudio('success');
-                } else {
-                    this.playAudio('fail');
-                }
-            }
-            this.gameOver.emit([message,status]);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private registerMove(source, target, promotion) {
         const move = this.chess.move({
             from: source,
             to: target,
             promotion: promotion
         });
-        this.playerMoved.emit();
+        if (this.chess.game_over()) {
+            let status;
+            if (this.chess.in_checkmate()) {
+                if (this.chess.turn() == 'w') {
+                    status = 'BWI';
+                } else {
+                    status = 'WWI';
+                }
+            } else {
+                status = 'DRA';
+            }
+            this.gameOver.emit(status);
+        } else {
+            this.playerMoved.emit();
+        }
     }
 
     private onMoveEnd(source, target) {
