@@ -119,7 +119,6 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
         const turnColor: Color = (this.player == 'b' ? 'black' : 'white');
         this.boardConfig = {
             fen: fen,
-            orientation: (this.player == 'b' ? colors[1] : colors[0]),
             turnColor: turnColor,
             premovable: {
                 enabled: false
@@ -143,7 +142,6 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
         };
         this.board = Chessground(document.getElementById('__analysis-chessboard__'), this.boardConfig);
         this.uglyForceBoardRedraw();
-    
     }
 
     afterMove(orig: Key, dest: Key, metadata: MoveMetadata) {
