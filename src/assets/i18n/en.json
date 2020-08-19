@@ -167,7 +167,7 @@
         "source-code": "Source code",
         "third-party": "Following software and resources has been used:",
         "chessjs-description": "A Javascript chess library for chess move generation/validation, piece placement/movement, and check/checkmate/draw detection",
-        "chessboard-description": "A Javascript chess board",
+        "chessboard-description": "Mobile/Web chess board",
         "multimedia-from": "Icons and Sounds from"
     }
 }

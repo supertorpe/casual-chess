@@ -390,15 +390,20 @@ export class PositionPage implements OnInit, OnDestroy {
     const infoWrapper: any = document.querySelector('.info_wrapper');
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    const minSize = Math.min(containerWidth, containerHeight);
+    let minSize = Math.min(containerWidth, containerHeight);
+    const mod = minSize % 8;
+    minSize = minSize - mod;
     boardWrapper.style.height = minSize + 'px';
     boardWrapper.style.width = minSize + 'px';
+    if (mod > 0) {
+      boardWrapper.style.paddingLeft = (mod / 2) + 'px';
+    }
     if (containerWidth > containerHeight) {
-      infoWrapper.style.width = containerWidth - minSize - 2 + 'px';
+      infoWrapper.style.width = (containerWidth - minSize - 2) + 'px';
       infoWrapper.style.height = '100%';
     } else {
       infoWrapper.style.width = '100%';
-      infoWrapper.style.height = containerHeight - minSize - 2 + 'px';
+      infoWrapper.style.height = (containerHeight - minSize - 2) + 'px';
     }
   }
 

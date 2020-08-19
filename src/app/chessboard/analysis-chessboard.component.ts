@@ -5,6 +5,10 @@ import { Howl, Howler } from 'howler';
 import { Subscription } from 'rxjs';
 import { PromotionDialog } from '../dialogs/promotion.dialog';
 import * as Chess from 'chess.js';
+import { Chessground }  from 'chessground';
+import { Api }  from 'chessground/api';
+import { colors, MoveMetadata, Color, Key }  from 'chessground/types';
+import { Config } from 'chessground/config';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigurationService, Configuration } from '../shared';
 
@@ -19,15 +23,14 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    private configuration: Configuration;
-    private board: any;
+    public configuration: Configuration;
+    private board: Api;
+    private boardConfig: Config;
     private chess: Chess = new Chess();
     
     private player: string;
-    private squareSelected;
     public texts: any;
     private sounds = [];
-    private isMobileBrowser = false;
 
     @Output() warn: EventEmitter<string> = new EventEmitter<string>();
     @Output() playerMoved: EventEmitter<string> = new EventEmitter<string>();
@@ -45,7 +48,6 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.isMobileBrowser = (null !== navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/));
         this.subscriptions.push(this.configurationService.onChange$.subscribe(event => this.configurationChanged(event)));
         this.subscriptions.push(this.translate.get([
             'chessboard.stalemate',
@@ -77,7 +79,7 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
 
     private configurationChanged(config) {
         this.configuration = config;
-        this.uglyForceBoardRedraw();
+        this.updateBoardConfig(this.fen()); 
     }
 
     private loadAudio() {
@@ -102,33 +104,82 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
     }
 
     @HostListener('window:resize', ['$event']) onResize(event) {
-        if (this.board) this.board.resize(event);
+        const boardWrapper: any = document.querySelector('.board_wrapper');
+        const board: any = document.getElementById('__analysis-chessboard__');
+        board.style.height = boardWrapper.clientWidth + 'px';
+        board.style.width = boardWrapper.clientHeight + 'px';
     }
 
     build(fen: string) {
-        const self = this;
         if (this.board) {
             this.board.destroy();
         }
         this.chess.load(fen);
         this.player = this.chess.turn();
-        this.board = ChessBoard('__analysis-chessboard__', {
-            position: fen,
-            pieceTheme: function (piece) { return '/assets/pieces/' + self.configuration.pieceTheme + '/' + piece + '.svg' },
-            draggable: true,
-            onDragStart: function (source, piece, position, orientation) { return self.onDragStart(source, piece, position, orientation); },
-            onDrop: function (source, target, piece, newPos, oldPos, orientation) { return self.onDrop(source, target, piece, newPos, oldPos, orientation); },
-            onMoveEnd: function (source, target) { self.onMoveEnd(source, target); },
-            onMouseoutSquare: function (square, piece, position, orientation) { self.onMouseoutSquare(square, piece, position, orientation); },
-            onMouseoverSquare: function (square, piece, position, orientation) { self.onMouseoverSquare(square, piece, position, orientation); },
-            onSnapEnd: function (source, target, piece) { self.onSnapEnd(source, target, piece); }
-        });
-        this.cleanHighlights();
+        const turnColor: Color = (this.player == 'b' ? 'black' : 'white');
+        this.boardConfig = {
+            fen: fen,
+            orientation: (this.player == 'b' ? colors[1] : colors[0]),
+            turnColor: turnColor,
+            premovable: {
+                enabled: false
+            },
+            movable: {
+                free: false,
+                color: turnColor,
+                dests: this.toDests(),
+                showDests: this.configuration.highlightSquares,
+                events: {
+                    after: (orig: Key, dest: Key, metadata: MoveMetadata) => this.afterMove(orig, dest, metadata)
+                }
+              },
+              highlight: {
+                lastMove: true,
+                check: true
+              },
+              draggable: {
+                showGhost: false
+              }
+        };
+        this.board = Chessground(document.getElementById('__analysis-chessboard__'), this.boardConfig);
         this.uglyForceBoardRedraw();
+    
     }
 
+    afterMove(orig: Key, dest: Key, metadata: MoveMetadata) {
+        // check promotion
+        if (this.chess.get(orig).type == 'p' && (dest.charAt(1) == '8' || dest.charAt(1) == '1')) {
+            this.promoteDialog().then(promotion => {
+                if (promotion) {
+                    this.registerMove(orig, dest, promotion);
+                }
+            });
+        } else {
+            this.registerMove(orig, dest, 'q');
+        }
+    }
+
+    updateBoardConfig(fen: string, highlight? : boolean) {
+        this.boardConfig.fen = fen;
+        const turnColor: Color = (this.chess.turn() == 'b' ? 'black' : 'white');
+        this.boardConfig.turnColor = turnColor;
+        this.boardConfig.movable.color = turnColor;
+        this.boardConfig.movable.dests = this.toDests();
+        this.boardConfig.highlight.lastMove = highlight;
+        this.board.set(this.boardConfig);
+    }
+
+    toDests(): Map<Key, Key[]> {
+        const dests = new Map();
+        this.chess.SQUARES.forEach(s => {
+          const ms = this.chess.moves({square: s, verbose: true});
+          if (ms.length) dests.set(s, ms.map(m => m.to));
+        });
+        return dests;
+      }
+
     flip() {
-        this.board.flip();
+        this.board.toggleOrientation();
     }
 
     fen() {
@@ -156,12 +207,11 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
     }
 
     public showFen(fen) {
-        this.cleanHighlights();
+        this.chess.load(fen);
+        this.updateBoardConfig(fen);
         if (this.configuration.playSounds) {
             this.playAudio('move');
         }
-        this.board.position(fen, true);
-        this.chess.load(fen);
         this.player = this.chess.turn();
     }
 
@@ -180,43 +230,6 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
             }
         });
     }
-
-    private onDragStart(source, piece, position, orientation) {
-        const re = this.player == 'w' ? /^b/ : /^w/;
-        if (this.chess.game_over() || piece.search(re) !== -1 || this.chess.turn() !== this.player) {
-            return false;
-        }
-        this.drawGreySquares(source);
-    };
-
-    private onDrop(source, target, piece, newPos, oldPos, orientation) {
-        this.removeGreySquares();
-        if (source == target) {
-            this.squareSelected = source;
-            this.drawGreySquares(source);
-            return;
-        }
-        // validate move
-        const move = this.chess.move({
-            from: source,
-            to: target,
-            promotion: 'q'
-        });
-        if (move === null) return 'snapback';
-        this.chess.undo();
-        this.squareSelected = target;
-        // check promotion
-        if (this.chess.get(source).type == 'p' && (target.charAt(1) == '8' || target.charAt(1) == '1')) {
-            this.promoteDialog().then(promotion => {
-                if (promotion) {
-                    this.registerMove(source, target, promotion);
-                }
-                this.board.position(this.chess.fen(), false);
-            });
-        } else {
-            this.registerMove(source, target, 'q');
-        }
-    };
 
     private checkGameOver(playsounds = true) {
         if (this.chess.game_over()) {
@@ -261,81 +274,7 @@ export class AnalysisChessboardComponent implements OnInit, OnDestroy {
                 this.playAudio(move.captured ? 'capture' : 'move');
             }
         }
+        this.updateBoardConfig(this.chess.fen(), true);
     }
 
-    private onMoveEnd(source, target) {
-    };
-
-    private onMouseoutSquare(square, piece, position, orientation) {
-        this.removeGreySquares();
-    };
-
-    private onMouseoverSquare(square, piece, position, orientation) {
-        if (this.chess.turn() !== this.player) {
-            return;
-        }
-        if (this.isMobileBrowser && this.squareSelected) {
-            this.onDrop(this.squareSelected, square, piece, null, null, orientation);
-            this.board.position(this.chess.fen(), false);
-            this.squareSelected = square;
-        } else if (piece) {
-            this.drawGreySquares(square);
-        }
-    };
-
-    private onSnapEnd(source, target, piece) {
-        this.highlightSquares(source, target);
-    };
-
-    private cleanHighlights() {
-        document.querySelectorAll('.highlight-square').forEach(square => {
-            square.classList.remove('highlight-square');
-        });
-    }
-
-    private highlightSquares(source, target) {
-        this.cleanHighlights();
-        document.querySelector('.square-' + source).classList.add('highlight-square');
-        document.querySelector('.square-' + target).classList.add('highlight-square');
-    }
-
-    private drawGreySquares(square) {
-        if (!this.configuration.highlightSquares) {
-            return;
-        }
-        // get list of possible moves for this square
-        const moves = this.chess.moves({ square: square, verbose: true });
-        // exit if there are no moves available for this square
-        if (moves.length === 0) return;
-        // highlight the square they moused over
-        this.greySquare(square);
-        // highlight the possible squares for this piece
-        moves.forEach(move => {
-            this.greySquare(move.to);
-        });
-    }
-
-    private greySquare(square) {
-        if (!this.configuration.highlightSquares) {
-            return;
-        }
-        const squareEl = document.querySelector(`#__analysis-chessboard__ .square-${square}`) as HTMLElement;
-        if (squareEl.classList.contains('black-3c85d')) {
-            squareEl.classList.add('move-dest-black');
-        } else {
-            squareEl.classList.add('move-dest-white');
-        }
-    };
-
-    private removeGreySquares() {
-        if (!this.configuration.highlightSquares) {
-            return;
-        }
-        document.querySelectorAll('.move-dest-black').forEach(function (el) {
-            el.classList.remove('move-dest-black');
-        });
-        document.querySelectorAll('.move-dest-white').forEach(function (el) {
-            el.classList.remove('move-dest-white');
-        });
-    };
 }

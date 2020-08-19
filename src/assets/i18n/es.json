@@ -166,7 +166,7 @@
         "third-party": "Para su desarrollo se ha utilizado el siguiente software y recursos de terceros:",
         "eco-description": "Base de datos de finales de ajedrez",
         "chessjs-description": "Librería Javascript para la generación / validación / posicionamiento de movimientos de piezas, y detección de jaque, mate y tablas",
-        "chessboard-description": "Un tablero de ajedrez en Javascript",
+        "chessboard-description": "Un tablero de ajedrez",
         "multimedia-from": "Iconos y Audio de"
     }
 }

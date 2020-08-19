@@ -38,15 +38,9 @@
               },
               {
                 "input": "src/global.scss"
-              },
-              {
-                "input": "node_modules/@chrisoakman/chessboardjs/dist/chessboard-1.0.0.css"
               }
             ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/@chrisoakman/chessboardjs/dist/chessboard-1.0.0.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
