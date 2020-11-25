@@ -15,6 +15,5 @@ import { ChessboardComponent } from '../chessboard';
     ])
   ],
   declarations: [PositionPage,ChessboardComponent],
-  entryComponents: []
 })
 export class PositionPageModule {}

@@ -15,6 +15,5 @@ import { AnalysisChessboardComponent } from '../chessboard';
     ])
   ],
   declarations: [AnalysisPage,AnalysisChessboardComponent],
-  entryComponents: []
 })
 export class AnalisysPageModule {}
