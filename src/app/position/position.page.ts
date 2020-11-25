@@ -560,7 +560,7 @@ export class PositionPage implements OnInit, OnDestroy {
                   .subscribe(response => {
                     toast.dismiss();
                     const bbcode = '[img]' + response.data.link + '[/img]';
-                    self.copyToClipboard(what, bbcode);
+                    self.copyToClipboard(what, self.chessboard.pgn() + '\r\n' + bbcode);
                   });
               };
               img.src = dataUrl;
