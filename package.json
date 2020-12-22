@@ -31,7 +31,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "chess.js": "^0.11.0",
     "chessground": "^7.9.3",
-    "dom-to-image-hm": "^2.6.1",
+    "dom-to-image-hm": "git+https://github.com/InYourHead/dom-to-image.git",
     "firebase": "^8.1.1",
     "howler": "^2.2.1",
     "ngx-lazy-image": "^1.0.2",

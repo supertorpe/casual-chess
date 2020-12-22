@@ -3711,10 +3711,9 @@ dom-storage@2.1.0:
   resolved "https://registry.yarnpkg.com/dom-storage/-/dom-storage-2.1.0.tgz#00fb868bc9201357ea243c7bcfd3304c1e34ea39"
   integrity sha512-g6RpyWXzl0RR6OTElHKBl7nwnK87GUyZMYC7JWsB/IA73vpqK2K6LT39x4VepLxlSsWBFrPVLnsSR5Jyty0+2Q==
 
-dom-to-image-hm@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/dom-to-image-hm/-/dom-to-image-hm-2.6.1.tgz#48cef41fb89358724eb05accf638a4f32ade8912"
-  integrity sha512-bDckSfKANS2IG6pM7Efcuj9L73yGmmMIUmL7c7kEdLJNnRVNqwh5EDTwTblnbzuZMUdt+sfD3pradj7MVFDDzg==
+"dom-to-image-hm@git+https://github.com/InYourHead/dom-to-image.git":
+  version "2.6.6"
+  resolved "git+https://github.com/InYourHead/dom-to-image.git#e88b2d02d56cc492e158c30ae494feb84cbb2d12"
 
 domain-browser@^1.1.1:
   version "1.2.0"
